@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"time"
 
-	"eos2git.cec.lab.emc.com/VCE-Symphony/workflow-cli/frutaskrunner"
+	"github.com/dellemc-symphony/workflow-cli/frutaskrunner"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

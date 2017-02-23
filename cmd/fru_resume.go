@@ -13,9 +13,9 @@ import (
 	"strconv"
 	"strings"
 
-	"eos2git.cec.lab.emc.com/VCE-Symphony/workflow-cli/frutaskrunner"
-	"eos2git.cec.lab.emc.com/VCE-Symphony/workflow-cli/models"
-	"eos2git.cec.lab.emc.com/VCE-Symphony/workflow-cli/utils"
+	"github.com/dellemc-symphony/workflow-cli/frutaskrunner"
+	"github.com/dellemc-symphony/workflow-cli/models"
+	"github.com/dellemc-symphony/workflow-cli/utils"
 
 	cleanhttp "github.com/hashicorp/go-cleanhttp"
 	"github.com/olekukonko/tablewriter"

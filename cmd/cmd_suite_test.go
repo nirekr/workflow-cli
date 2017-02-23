@@ -1,7 +1,7 @@
 package cmd_test
 
 import (
-	"eos2git.cec.lab.emc.com/VCE-Symphony/workflow-cli/mock"
+	"github.com/dellemc-symphony/workflow-cli/mock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/gin-gonic/gin.v1"
