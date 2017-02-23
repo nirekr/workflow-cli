@@ -1,0 +1,59 @@
+# The following is the defined listing within CPSD that we do not include in our Source Code Repositories.
+# This list will be updated when new file types are identified that we do not want to contribute to the Version Control System.
+# Packaged Files and Binaries
+*.jar
+*.war
+*.ear
+# Log Files and Crash Dumps
+*.log
+hs_err_pid*
+# IDE Explicit Files
+.idea
+*.iml
+.settings
+.classpath
+.project
+.directory
+nb-configuration.xml
+nbactions.xml
+# Specific Maven Content
+target/
+# Java
+*.class
+
+# Compiled Object files, Static and Dynamic libs (Shared Objects)
+*.o
+*.a
+*.so
+
+# Folders
+_obj
+_test
+
+# Architecture specific extensions/prefixes
+*.[568vq]
+[568vq].out
+
+*.cgo1.go
+*.cgo2.c
+_cgo_defun.c
+_cgo_gotypes.go
+_cgo_export.*
+
+_testmain.go
+
+*.exe
+*.test
+*.prof
+
+*.coverprofile
+bin/
+vendor
+
+# Build Packagaing
+packer_cache
+packer-vmware-iso
+# General Content
+Thumbs.db
+desktop.ini
+*.DS_Store
