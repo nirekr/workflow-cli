@@ -6,7 +6,7 @@
 package cmd
 
 import (
-	"eos2git.cec.lab.emc.com/VCE-Symphony/workflow-cli/frutaskrunner"
+	"github.com/dellemc-symphony/workflow-cli/frutaskrunner"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

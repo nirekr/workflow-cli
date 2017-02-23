@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"eos2git.cec.lab.emc.com/VCE-Symphony/workflow-cli/models"
+	"github.com/dellemc-symphony/workflow-cli/models"
 	"github.com/braintree/manners"
 	"github.com/gin-gonic/gin"
 )

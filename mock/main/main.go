@@ -1,7 +1,7 @@
 package main
 
 import (
-	"eos2git.cec.lab.emc.com/VCE-Symphony/workflow-cli/mock"
+	"github.com/dellemc-symphony/workflow-cli/mock"
 	log "github.com/sirupsen/logrus"
 )
 
