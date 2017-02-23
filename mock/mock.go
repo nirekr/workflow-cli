@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dellemc-symphony/workflow-cli/models"
 	"github.com/braintree/manners"
+	"github.com/dellemc-symphony/workflow-cli/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,6 +20,12 @@ func CreateMock() {
 	router := gin.Default()
 	id := "123abc-456def-789ghi"
 	retry := true
+
+	router.GET("/about", func(c *gin.Context) {
+
+		c.String(http.StatusOK, "up and running")
+
+	})
 
 	router.POST("/fru/api/workflow", func(c *gin.Context) {
 		stepNext := models.Link{

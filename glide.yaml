@@ -1,6 +1,6 @@
-package: eos2git.cec.lab.emc.com/VCE-Symphony/workflow-cli
+package: github.com/dellemc-symphony/workflow-cli
 import:
-- package: eos2git.cec.lab.emc.com/VCE-Symphony/workflow-cli.git
+- package: github.com/dellemc-symphony/workflow-cli.git
   subpackages:
   - auth
 - package: github.com/spf13/cobra
