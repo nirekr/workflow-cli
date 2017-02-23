@@ -1,7 +1,7 @@
 hash: f5a34b64baa0b0cf91330d6cff7059301ae7420da3f6b8e24c72e0241859a746
 updated: 2017-02-15T08:05:28.318583001-05:00
 imports:
-- name: eos2git.cec.lab.emc.com/VCE-Symphony/workflow-cli.git
+- name: github.com/dellemc-symphony/workflow-cli.git
   version: 26be479a1cbaac0105d43fd99a307146c0225a3c
   subpackages:
   - auth
