@@ -42,7 +42,7 @@ ex.: workflow-cli fru target http://192.168.1.1:80`,
 
 		// Argument required
 		if len(args) > 1 {
-			log.Printf("Too Many Arguments.\n")
+			log.Warnf("Too Many Arguments.\n")
 			return
 		} else if len(args) < 1 {
 			// Check and see if the endpoint has been set
@@ -77,7 +77,7 @@ ex.: workflow-cli fru target http://192.168.1.1:80`,
 			}
 
 			if target.Host == "" || target.Scheme == "" {
-				log.Printf("Please enter a valid target url. ex: http://192.168.1.1:80\n")
+				log.Warnf("Please enter a valid target url. ex: http://192.168.1.1:80\n")
 				return
 			}
 
@@ -89,22 +89,22 @@ ex.: workflow-cli fru target http://192.168.1.1:80`,
 
 			// Error check the REST call
 			if err != nil {
-				log.Printf("Error sending '/about' API call: %s\n", err)
+				log.Warnf("Error sending '/about' API call: %s\n", err)
 				return
 			}
 			if res.StatusCode != 200 {
-				log.Printf("Non-success status code returned:")
+				fmt.Printf("Non-success status code returned:")
 				color.Red("%d\n", res.StatusCode)
 				return
 			}
 
 			respBytes, err := ioutil.ReadAll(res.Body)
 			if err != nil {
-				log.Printf("Error reading response body: %s\n", err)
+				log.Warnf("Error reading response body: %s\n", err)
 			}
 
 			if string(respBytes) != "up and running" {
-				log.Printf("Invalid response: %s\n", respBytes)
+				log.Warnf("Invalid response: %s\n", respBytes)
 				return
 			}
 
@@ -113,7 +113,7 @@ ex.: workflow-cli fru target http://192.168.1.1:80`,
 			// Store target URL of valid endpoint
 			targetb, err := json.Marshal(target)
 			if err != nil {
-				log.Printf("Could not marshal IP Address to JSON: %s\n", err)
+				log.Warnf("Could not marshal IP Address to JSON: %s\n", err)
 				return
 			}
 
@@ -125,7 +125,7 @@ ex.: workflow-cli fru target http://192.168.1.1:80`,
 			fileLocation := fmt.Sprintf("%s/.fru", dir)
 			err = ioutil.WriteFile(fileLocation, targetb, 0666)
 			if err != nil {
-				log.Printf("Error storing IP address to file: %s\n", err)
+				log.Warnf("Error storing IP address to file: %s\n", err)
 				return
 			}
 		}

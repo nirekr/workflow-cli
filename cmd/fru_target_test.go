@@ -39,7 +39,7 @@ var _ = Describe("Commands", func() {
 		Context("When calling 'target' with invalid url", func() {
 			It("UNIT should check input with JSON Marshal and fail", func() {
 				responseBytes := []byte("THIS SHOULD FAIL")
-				expectedOutput := fmt.Sprintf("Invalid response body: %s\n", responseBytes)
+				expectedOutput := fmt.Sprintf("Invalid response: %s\n", responseBytes)
 
 				server.AppendHandlers(
 					ghttp.CombineHandlers(
@@ -50,7 +50,7 @@ var _ = Describe("Commands", func() {
 
 				// Set up command to test
 				cmd := exec.Command(binLocation, "fru", "target", server.URL())
-				out, _ := cmd.StdoutPipe()
+				out, _ := cmd.StderrPipe()
 				cmd.Start()
 
 				// Capture Standard Output to verify
