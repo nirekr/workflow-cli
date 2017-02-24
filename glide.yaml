@@ -1,10 +1,17 @@
 package: github.com/dellemc-symphony/workflow-cli
 import:
-- package: github.com/dellemc-symphony/workflow-cli.git
-  subpackages:
-  - auth
+- package: github.com/braintree/manners
+- package: github.com/fatih/color
+- package: github.com/gin-gonic/gin
+- package: github.com/hashicorp/go-cleanhttp
+- package: github.com/mitchellh/go-homedir
+- package: github.com/olekukonko/tablewriter
+- package: github.com/sirupsen/logrus
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
-- package: golang.org/x/crypto
+testImport:
+- package: github.com/onsi/ginkgo
+- package: github.com/onsi/gomega
   subpackages:
-  - ssh/terminal
+  - ghttp
+- package: gopkg.in/gin-gonic/gin.v1
