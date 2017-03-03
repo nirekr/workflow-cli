@@ -42,12 +42,14 @@ func TargetAuth(target string) (string, string, string, error) {
 	}
 
 	// Get Password
+	fmt.Printf("Enter %s Password: ", target)
 	password, err := terminal.ReadPassword(int(syscall.Stdin))
 
 	if err != nil {
 		log.Warnf("Error reading password: %s", err)
 		return "", "", "", err
 	}
+	fmt.Printf("\n")
 
 	return endpoint, userName, string(password), nil
 
