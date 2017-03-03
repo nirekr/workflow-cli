@@ -27,7 +27,7 @@ var _ = Describe("Commands", func() {
 		server = ghttp.NewServer()
 		dir, err := homedir.Dir()
 		Expect(err).ToNot(HaveOccurred())
-		StateFile = fmt.Sprintf("%s/.fru", dir)
+		StateFile = fmt.Sprintf("%s/.cli", dir)
 	})
 
 	AfterEach(func() {
@@ -36,33 +36,7 @@ var _ = Describe("Commands", func() {
 	})
 
 	Describe("Test the  commands", func() {
-		Context("When calling 'target' with invalid url", func() {
-			It("UNIT should check input with JSON Marshal and fail", func() {
-				responseBytes := []byte("THIS SHOULD FAIL")
-				expectedOutput := fmt.Sprintf("Invalid response: %s\n", responseBytes)
 
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/about"),
-						ghttp.RespondWith(http.StatusOK, responseBytes),
-					),
-				)
-
-				// Set up command to test
-				cmd := exec.Command(binLocation, "fru", "target", server.URL())
-				out, _ := cmd.StderrPipe()
-				cmd.Start()
-
-				// Capture Standard Output to verify
-				buf := new(bytes.Buffer)
-				buf.ReadFrom(out)
-				s := buf.String()
-
-				// Verify output
-				Expect(s).To(ContainSubstring(expectedOutput))
-
-			})
-		})
 		Context("call target with valid input", func() {
 			It("INTEGRATION should set info for the target", func() {
 
@@ -70,13 +44,13 @@ var _ = Describe("Commands", func() {
 				expectedResponseData := []byte(responseString)
 				server.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/about"),
+						ghttp.VerifyRequest("GET", "/fru/api/about"),
 						ghttp.RespondWith(http.StatusOK, expectedResponseData),
 					),
 				)
 
 				// Set up command to test
-				cmd := exec.Command(binLocation, "fru", "target", server.URL())
+				cmd := exec.Command(binLocation, "target", server.URL())
 				out, _ := cmd.StdoutPipe()
 				cmd.Start()
 
@@ -92,7 +66,7 @@ var _ = Describe("Commands", func() {
 				// Verify output
 				expectedString := fmt.Sprintf("Target set to %s\n", server.URL())
 
-				Expect(s).To(Equal(expectedString))
+				Expect(s).To(ContainSubstring(expectedString))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(server.ReceivedRequests()).To(HaveLen(1))
 			})
@@ -112,7 +86,7 @@ var _ = Describe("Commands", func() {
 				_ = os.Remove(StateFile)
 			})
 			It("INTEGRATION should display endpoint after target", func() {
-				cmd := exec.Command(binLocation, "fru", "target")
+				cmd := exec.Command(binLocation, "target")
 				out, _ := cmd.StdoutPipe()
 				cmd.Start()
 
@@ -121,20 +95,20 @@ var _ = Describe("Commands", func() {
 				buf.ReadFrom(out)
 				s := buf.String()
 
-				Expect(s).To(Equal(fmt.Sprintf("Current target is %s\n", server.URL())))
+				Expect(s).To(ContainSubstring(fmt.Sprintf("Current target is %s\n", server.URL())))
 			})
 		})
 		Context("no target has been set", func() {
 			It("INTEGRATION should display no target set", func() {
-				cmd := exec.Command(binLocation, "fru", "target")
-				out, _ := cmd.StdoutPipe()
+				cmd := exec.Command(binLocation, "target")
+				out, _ := cmd.StderrPipe()
 				cmd.Start()
 
 				buf := new(bytes.Buffer)
 				buf.ReadFrom(out)
 				s := buf.String()
 
-				Expect(s).To(Equal(fmt.Sprintf("No target set.\n")))
+				Expect(s).To(ContainSubstring(fmt.Sprintf("No target set")))
 			})
 		})
 	})

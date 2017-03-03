@@ -3,8 +3,11 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
+	"net/url"
 )
 
 // DecodeBody is used to JSON decode a body
@@ -21,4 +24,28 @@ func EncodeBody(obj interface{}) (io.Reader, error) {
 		return nil, err
 	}
 	return buf, nil
+}
+
+// GetStatus is a ...
+func GetStatus(targetURL url.URL) (interface{}, error) {
+	// Convert argument to REST call
+	targetString := fmt.Sprintf("%s://%s/fru/api/about", targetURL.Scheme, targetURL.Host)
+
+	// Send API call to validate that argument points to running server
+	resp, err := http.Get(targetString)
+	if err != nil {
+		return nil, fmt.Errorf("Error sending API call: %s", err)
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("Non-success status returned (%d): %s", resp.StatusCode, resp.Status)
+	}
+
+	respBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("Error reading response body: %s", err)
+
+	}
+
+	return respBytes, nil
 }
