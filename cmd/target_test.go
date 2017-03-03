@@ -100,6 +100,12 @@ var _ = Describe("Commands", func() {
 		})
 		Context("no target has been set", func() {
 			It("INTEGRATION should display no target set", func() {
+
+				_, err := os.Stat(StateFile)
+				if err != nil {
+					os.Remove(StateFile)
+				}
+
 				cmd := exec.Command(binLocation, "target")
 				out, _ := cmd.StderrPipe()
 				cmd.Start()
