@@ -18,12 +18,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"net/url"
 	"os"
 
-	"github.com/fatih/color"
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/dellemc-symphony/workflow-cli/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -34,7 +32,7 @@ var targetCmd = &cobra.Command{
 	Short: "IP endpoint to target",
 	Long: `IP endpoint to target.
 This command will attempt a call to the IP specified, and if successful,
-will store the IP for future use in the .fru file
+will store the IP for future use in the config file (default is ~/.cli)
 Usage: workflow-cli fru target http://<ip address>:<port>
 ex.: workflow-cli fru target http://192.168.1.1:80`,
 
@@ -46,14 +44,8 @@ ex.: workflow-cli fru target http://192.168.1.1:80`,
 			return
 		} else if len(args) < 1 {
 			// Check and see if the endpoint has been set
-			dir, err := homedir.Dir()
-
-			if err != nil {
-				log.Fatal(err)
-			}
-			fileLocation := fmt.Sprintf("%s/.fru", dir)
-			if _, err := os.Stat(fileLocation); err == nil {
-				fileContent, err := ioutil.ReadFile(fileLocation)
+			if _, err := os.Stat(configFile); err == nil {
+				fileContent, err := ioutil.ReadFile(configFile)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -64,68 +56,42 @@ ex.: workflow-cli fru target http://192.168.1.1:80`,
 					log.Fatal(err)
 				}
 				fmt.Printf("Current target is ")
-				color.Green("%s://%s\n", urlObject.Scheme, urlObject.Host)
+				fmt.Printf("%s://%s\n", urlObject.Scheme, urlObject.Host)
 			} else {
-				color.Red("No target set.\n")
+				log.Warnf("No target set %s", err)
+				return
 			}
 		} else {
 			// Parse and validate argument
-			target, err := url.Parse(args[0])
+			targetURL, err := url.Parse(args[0])
 			if err != nil {
-				color.Red("Could not convert arg to IP Address: %s\n", err)
+				log.Warnf("Could not convert arg to IP Address: %s", err)
 				return
 			}
 
-			if target.Host == "" || target.Scheme == "" {
+			if targetURL.Host == "" || targetURL.Scheme == "" {
 				log.Warnf("Please enter a valid target url. ex: http://192.168.1.1:80\n")
 				return
 			}
 
-			// Convert argument to REST call
-			targetURL := fmt.Sprintf("%s://%s/about", target.Scheme, target.Host)
-
-			// Send API call to validate that argument points to running server
-			res, err := http.Get(targetURL)
-
-			// Error check the REST call
+			_, err = utils.GetStatus(*targetURL)
 			if err != nil {
-				log.Warnf("Error sending '/about' API call: %s\n", err)
-				return
-			}
-			if res.StatusCode != 200 {
-				fmt.Printf("Non-success status code returned:")
-				color.Red("%d\n", res.StatusCode)
+				log.Warnf(err.Error())
 				return
 			}
 
-			respBytes, err := ioutil.ReadAll(res.Body)
-			if err != nil {
-				log.Warnf("Error reading response body: %s\n", err)
-			}
-
-			if string(respBytes) != "up and running" {
-				log.Warnf("Invalid response: %s\n", respBytes)
-				return
-			}
-
-			color.Green("Target set to %s://%s\n", target.Scheme, target.Host)
+			fmt.Printf("Target set to %s://%s\n", targetURL.Scheme, targetURL.Host)
 
 			// Store target URL of valid endpoint
-			targetb, err := json.Marshal(target)
+			targetb, err := json.Marshal(targetURL)
 			if err != nil {
-				log.Warnf("Could not marshal IP Address to JSON: %s\n", err)
+				log.Warnf("Could not marshal IP Address to JSON: %s", err)
 				return
 			}
 
-			// Determine where to store state file
-			dir, err := homedir.Dir()
+			err = ioutil.WriteFile(configFile, targetb, 0666)
 			if err != nil {
-				log.Fatal(err)
-			}
-			fileLocation := fmt.Sprintf("%s/.fru", dir)
-			err = ioutil.WriteFile(fileLocation, targetb, 0666)
-			if err != nil {
-				log.Warnf("Error storing IP address to file: %s\n", err)
+				log.Warnf("Error storing IP address to file: %s", err)
 				return
 			}
 		}
@@ -134,6 +100,6 @@ ex.: workflow-cli fru target http://192.168.1.1:80`,
 }
 
 func init() {
-	fruCmd.AddCommand(targetCmd)
+	RootCmd.AddCommand(targetCmd)
 
 }

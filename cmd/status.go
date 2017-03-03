@@ -6,9 +6,13 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
-	"net"
+	"io/ioutil"
+	"net/url"
 
+	"github.com/dellemc-symphony/workflow-cli/utils"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -19,28 +23,24 @@ var statusCmd = &cobra.Command{
 	Long: `Only to be used to determine that the system is
 up and running. Does not provide information about VxRack system.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// this is a mock response call
-		//var addrs string
-		var ip net.IP
-		interfaces, err := net.Interfaces()
+		fileContent, err := ioutil.ReadFile(configFile)
 		if err != nil {
-			return err
+			log.Fatalf("Error reading config file: %s", err)
 		}
-		for _, val := range interfaces {
-			addr, err := val.Addrs()
-			if err != nil {
-				return err
-			}
-			for _, a := range addr {
-				switch v := a.(type) {
-				case *net.IPNet:
-					ip = v.IP
-				case *net.IPAddr:
-					ip = v.IP
-				}
-			}
+		// Unmarshal data and print
+		urlObject := url.URL{}
+		err = json.Unmarshal(fileContent, &urlObject)
+		if err != nil {
+			log.Fatal(err)
 		}
-		fmt.Printf("Gateway is UP on %s\n", ip)
+
+		resp, err := utils.GetStatus(urlObject)
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+
+		fmt.Printf("Status: \n%s\n", resp)
+
 		return nil
 	},
 }

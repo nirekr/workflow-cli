@@ -21,7 +21,7 @@ func CreateMock() {
 	id := "123abc-456def-789ghi"
 	retry := true
 
-	router.GET("/about", func(c *gin.Context) {
+	router.GET("/fru/api/about", func(c *gin.Context) {
 
 		c.String(http.StatusOK, "up and running")
 

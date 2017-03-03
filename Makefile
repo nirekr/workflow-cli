@@ -16,7 +16,6 @@ creds:
 deps:
 	go get github.com/Masterminds/glide
 	go get github.com/onsi/ginkgo/ginkgo
-	go get github.com/fatih/color
 	go get github.com/onsi/gomega
 	glide install
 	env GOOS=windows go get -d ./...
