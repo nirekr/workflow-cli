@@ -6,6 +6,10 @@
 package cmd
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"net/url"
+
 	"github.com/dellemc-symphony/workflow-cli/frutaskrunner"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -23,7 +27,18 @@ left off`,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("Initiating workflow: quanta-replacement-d51b-esxi")
 
-		r, err := frutaskrunner.InitiateWorkflow(target)
+		fileContent, err := ioutil.ReadFile(configFile)
+		if err != nil {
+			log.Fatalf("Error reading config file: %s", err)
+		}
+		// Unmarshal data and print
+		urlObject := url.URL{}
+		err = json.Unmarshal(fileContent, &urlObject)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		r, err := frutaskrunner.InitiateWorkflow(urlObject.String())
 		if err != nil {
 			log.Warnf("Error starting FRU task: %s", err)
 		}

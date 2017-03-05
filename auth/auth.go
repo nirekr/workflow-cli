@@ -10,6 +10,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"syscall"
+
+	"golang.org/x/crypto/ssh/terminal"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -40,15 +43,25 @@ func TargetAuth(target string) (string, string, string, error) {
 
 	// Get Password
 	fmt.Printf("Enter %s Password: ", target)
-	fmt.Print("\033[8m") // Hide input
-	scanner.Scan()
-	password := scanner.Text()
-	fmt.Print("\033[28m") // Show input
+	password, err := terminal.ReadPassword(int(syscall.Stdin))
 
-	if err := scanner.Err(); err != nil {
+	if err != nil {
 		log.Warnf("Error reading password: %s", err)
 		return "", "", "", err
 	}
+	fmt.Printf("\n")
 
-	return endpoint, userName, password, nil
+	return endpoint, userName, string(password), nil
+
+	// fmt.Printf("Enter %s Password: ", target)
+	// fmt.Print("\033[8m") // Hide input
+	// scanner.Scan()
+	// password := scanner.Text()
+	// fmt.Print("\033[28m") // Show input
+	//
+	// if err := scanner.Err(); err != nil {
+	// 	log.Warnf("Error reading password: %s", err)
+	// 	return "", "", "", err
+	// }
+	//return endpoint, userName, password, nil
 }
