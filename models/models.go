@@ -36,6 +36,11 @@ type Node struct {
 	SerialNumber string `json:"serial-number,omitempty"`
 }
 
+// DataResponse is a struct ...
+type DataResponse struct {
+	Response string `json:"response,omitempty"`
+}
+
 // Links is an array of link objs
 type Links []Link
 

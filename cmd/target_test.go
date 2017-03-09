@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
@@ -39,18 +38,8 @@ var _ = Describe("Commands", func() {
 
 		Context("call target with valid input", func() {
 			It("INTEGRATION should set info for the target", func() {
-
-				responseString := "up and running"
-				expectedResponseData := []byte(responseString)
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/fru/api/about"),
-						ghttp.RespondWith(http.StatusOK, expectedResponseData),
-					),
-				)
-
 				// Set up command to test
-				cmd := exec.Command(binLocation, "target", server.URL())
+				cmd := exec.Command(binLocation, "target", "http://localhost:8080")
 				out, _ := cmd.StdoutPipe()
 				cmd.Start()
 
@@ -64,11 +53,10 @@ var _ = Describe("Commands", func() {
 				_, err := ioutil.ReadFile(StateFile)
 
 				// Verify output
-				expectedString := fmt.Sprintf("Target set to %s\n", server.URL())
+				expectedString := fmt.Sprintf("Target set to %s\n", "http://localhost:8080")
 
 				Expect(s).To(ContainSubstring(expectedString))
 				Expect(err).ToNot(HaveOccurred())
-				Expect(server.ReceivedRequests()).To(HaveLen(1))
 			})
 		})
 		Context("Ater target has been set", func() {

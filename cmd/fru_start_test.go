@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"net/http"
+	"os"
 	"os/exec"
 	"runtime"
 	"time"
 
+	homedir "github.com/mitchellh/go-homedir"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
@@ -16,30 +17,26 @@ import (
 
 var _ = Describe("FruStart", func() {
 	var binLocation string
+	var StateFile string
 	var server *ghttp.Server
 
 	BeforeEach(func() {
 		server = ghttp.NewServer()
 		binLocation = fmt.Sprintf("../bin/%s/workflow-cli", runtime.GOOS)
+		dir, err := homedir.Dir()
+		Expect(err).ToNot(HaveOccurred())
+		StateFile = fmt.Sprintf("%s/.cli", dir)
+
 	})
 	AfterEach(func() {
 		server.Close()
+		os.Remove(StateFile)
 	})
 
 	Context("When command is called", func() {
 		It("UNIT should run the 'fru start' command successfully", func() {
-			responseString := "up and running"
-			expectedResponseData := []byte(responseString)
-			server.AppendHandlers(
-				ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/fru/api/about"),
-					ghttp.RespondWith(http.StatusOK, expectedResponseData),
-				),
-			)
-
 			cmd := exec.Command(binLocation, "target", "http://localhost:8080")
-			cmd.Start()
-			cmd.Wait()
+			cmd.Run()
 
 			cmd = exec.Command(binLocation, "fru", "start")
 
