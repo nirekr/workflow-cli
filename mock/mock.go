@@ -27,6 +27,17 @@ func CreateMock() {
 
 	})
 
+	router.GET("/fru/api/data/:taskid", func(c *gin.Context) {
+		//taskid := c.Param("taskid")
+
+		response := models.DataResponse{
+			Response: "YooHoo!",
+		}
+
+		c.JSON(http.StatusOK, response)
+
+	})
+
 	router.POST("/fru/api/workflow", func(c *gin.Context) {
 		stepNext := models.Link{
 			Rel:    "step-next",
