@@ -49,15 +49,15 @@ pipeline {
                     github-release release \
                         --user dellemc-symphony \
                         --repo workflow-cli \
-                        --tag v0.0.1-TEST \
-                        --name "TEST RELEASE UNO" \
-                        --description "Release before you release!"
+                        --tag v0.0.1-${BUILD_ID} \
+                        --name "Workflow CLI Release" \
+                        --description "Workflow CLI Release"
                     github-release upload \
                         --user dellemc-symphony \
                         --repo workflow-cli \
-                        --tag v0.0.1-TEST \
-                        --name "release_test" \
-                        --file release.tar.gz
+                        --tag v0.0.1-${BUILD_ID} \
+                        --name "Workflow CLI" \
+                        --file release-v0.0.1-${BUILD_ID}.tar.gz
                 '''
             }
         }
