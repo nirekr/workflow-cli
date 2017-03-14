@@ -8,7 +8,6 @@ pipeline {
     environment {
         GIT_CREDS = credentials('github-03')
         GITHUB_TOKEN = credentials('github-01')
-        BRANCH_NAME = git rev-parse --abbrev-ref HEAD
     }
     stages {
         stage('Dependencies') {
@@ -18,6 +17,7 @@ pipeline {
                    mkdir -p /go/src/github.com/dellemc-symphony/workflow-cli
                    cp -r . /go/src/github.com/dellemc-symphony/workflow-cli/
                    cd /go/src/github.com/dellemc-symphony/workflow-cli/
+                   export BRANCH_NAME=${git rev-parse --abbrev-ref HEAD}
                    make creds
                    make deps
                 '''
