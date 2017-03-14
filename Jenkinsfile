@@ -8,7 +8,7 @@ pipeline {
     environment {
         GIT_CREDS = credentials('github-03')
         GITHUB_TOKEN = credentials('github-01')
-        BRANCH_NAME = ${GIT_BRANCH#*/}
+        BRANCH_NAME = git rev-parse --abbrev-ref HEAD
     }
     stages {
         stage('Dependencies') {
