@@ -17,7 +17,7 @@ pipeline {
                    mkdir -p /go/src/github.com/dellemc-symphony/workflow-cli
                    cp -r . /go/src/github.com/dellemc-symphony/workflow-cli/
                    cd /go/src/github.com/dellemc-symphony/workflow-cli/
-                   export BRANCH_NAME=${git rev-parse --abbrev-ref HEAD}
+                   export BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
                    make creds
                    make deps
                 '''
