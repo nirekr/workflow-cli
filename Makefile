@@ -2,6 +2,26 @@ ORGANIZATION = cpsd
 PROJECT = workflow-cli
 BINARYNAME = workflow-cli
 GOOUT = ./bin
+SHELL = /bin/bash
+
+# variable definitions
+PKGPATH = github.com/dellemc-symphony/workflow-cli
+COMMITHASH = $(shell git describe --tags --always --dirty)
+BUILDDATE = $(shell date -u)
+GOVERSION = $(shell go version)
+ifndef BUILD_ID
+	RELEASEVERSION = v0.0.1-dev
+else
+	RELEASEVERSION = v0.0.1-${BUILD_ID}
+endif
+
+#Flags to pass to main.go
+LDFLAGS = -ldflags "-X '${PKGPATH}/cmd.binaryName=${BINARYNAME}' \
+	  -X '${PKGPATH}/cmd.buildDate=${BUILDDATE}' \
+	  -X '${PKGPATH}/cmd.commitHash=${COMMITHASH}' \
+	  -X '${PKGPATH}/cmd.goVersion=${GOVERSION}' \
+	  -X '${PKGPATH}/cmd.releaseVersion=${RELEASEVERSION}' "
+
 
 default: deps build test
 
@@ -38,10 +58,10 @@ cover-cmd: test
 build: build-Linux build-Mac build-Windows
 
 build-Linux:
-	env GOOS=linux go build -o $(GOOUT)/linux/$(BINARYNAME)
+	env GOOS=linux go build -o $(GOOUT)/linux/$(BINARYNAME) $(LDFLAGS)
 
 build-Mac:
-	env GOOS=darwin go build -o $(GOOUT)/darwin/$(BINARYNAME)
+	env GOOS=darwin go build -o $(GOOUT)/darwin/$(BINARYNAME) $(LDFLAGS)
 
 build-Windows:
-	env GOOS=windows go build -o $(GOOUT)/windows/$(BINARYNAME).exe
+	env GOOS=windows go build -o $(GOOUT)/windows/$(BINARYNAME).exe $(LDFLAGS)

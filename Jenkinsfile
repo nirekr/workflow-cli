@@ -45,7 +45,8 @@ pipeline {
             steps {
                 sh '''
                     go get -u github.com/aktau/github-release
-                    tar -czvf release.tar.gz /go/src/github.com/dellemc-symphony/workflow-cli/bin
+                    cd /go/src/github.com/dellemc-symphony/workflow-cli/
+                    tar -czvf release-v0.0.1-${BUILD_ID}.tar.gz bin/
                     github-release release \
                         --user dellemc-symphony \
                         --repo workflow-cli \
@@ -56,7 +57,7 @@ pipeline {
                         --user dellemc-symphony \
                         --repo workflow-cli \
                         --tag v0.0.1-${BUILD_ID} \
-                        --name "Workflow CLI" \
+                        --name "WorkflowCLI.tar.gz" \
                         --file release-v0.0.1-${BUILD_ID}.tar.gz
                 '''
             }
