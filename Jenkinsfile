@@ -8,6 +8,7 @@ pipeline {
     environment {
         GIT_CREDS = credentials('github-03')
         GITHUB_TOKEN = credentials('github-01')
+        BRANCH_NAME = "master"
     }
     stages {
         stage('Dependencies') {
