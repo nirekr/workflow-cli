@@ -7,7 +7,7 @@ pipeline {
     }
     environment {
         GIT_CREDS = credentials('github-03')
-        GITHUB_TOKEN = credentials('github-01')
+        GITHUB_TOKEN = credentials('github-02')
     }
     stages {
         stage('Dependencies') {
@@ -18,22 +18,48 @@ pipeline {
                    #cp -r . /go/src/github.com/dellemc-symphony/workflow-cli/
                    #cd /go/src/github.com/dellemc-symphony/workflow-cli/
                    
-                   printenv
-                   echo $GIT_BRANCH
-
                    #make creds
                    #make deps
                 '''
             }
         }
-
+        stage('Unit Tests') {
+            steps {
+                sh '''
+                    #cd /go/src/github.com/dellemc-symphony/workflow-cli/
+                    #make unit-test
+                '''
+            }
+        }
+        stage('Integration Tests') {
+            steps {
+                sh '''
+                    #cd /go/src/github.com/dellemc-symphony/workflow-cli/
+                    #make integration-test
+                '''
+            }
+        }
         stage('Release') {
             when {
-                branch "master"
+                environment name: "JOB_NAME", value: "workflow-cli-master"
             }
             steps {
                 sh '''
-                    echo "RELEASE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+                    go get -u github.com/aktau/github-release
+                    cd /go/src/github.com/dellemc-symphony/workflow-cli/
+                    tar -czvf release-v0.0.1-${BUILD_ID}.tar.gz bin/
+                    github-release release \
+                        --user dellemc-symphony \
+                        --repo workflow-cli \
+                        --tag v0.0.1-${BUILD_ID} \
+                        --name "Workflow CLI Release" \
+                        --description "Workflow CLI Release"
+                    github-release upload \
+                        --user dellemc-symphony \
+                        --repo workflow-cli \
+                        --tag v0.0.1-${BUILD_ID} \
+                        --name "WorkflowCLI.tar.gz" \
+                        --file release-v0.0.1-${BUILD_ID}.tar.gz
                 '''
             }
         }
