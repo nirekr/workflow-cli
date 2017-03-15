@@ -18,13 +18,6 @@ pipeline {
                    cp -r . /go/src/github.com/dellemc-symphony/workflow-cli/
                    cd /go/src/github.com/dellemc-symphony/workflow-cli/
                    
-                   REF=$(git reflog | head -n 1 | grep "moving from master")
-                   if [ "$REF" != "" ];then
-                     export BRANCH_NAME='master'
-                   else
-                     export BRANCH_NAME='not-master'
-                   fi
-
                    make creds
                    make deps
                 '''
