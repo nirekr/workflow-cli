@@ -6,6 +6,7 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -51,7 +52,13 @@ system configurations. It currently does not allow changes to the collected data
 			log.Fatalf(err.Error())
 		}
 
-		fmt.Printf("Data: \n%s\n", resp)
+		var data bytes.Buffer
+		err = json.Indent(&data, resp.([]byte), "", "    ")
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+
+		fmt.Printf("Fru Data: \n%s\n", data.Bytes())
 	},
 }
 

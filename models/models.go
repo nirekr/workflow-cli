@@ -36,9 +36,10 @@ type Node struct {
 	SerialNumber string `json:"serial-number,omitempty"`
 }
 
-// DataResponse is a struct ...
-type DataResponse struct {
+// MockDataResponse is a struct ...
+type MockDataResponse struct {
 	Response string `json:"response,omitempty"`
+	TaskID   string `json:"taskid,omitempty"`
 }
 
 // Links is an array of link objs
