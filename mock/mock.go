@@ -28,10 +28,11 @@ func CreateMock() {
 	})
 
 	router.GET("/fru/api/data/:taskid", func(c *gin.Context) {
-		//taskid := c.Param("taskid")
+		taskid := c.Param("taskid")
 
-		response := models.DataResponse{
+		response := models.MockDataResponse{
 			Response: "YooHoo!",
+			TaskID:   taskid,
 		}
 
 		c.JSON(http.StatusOK, response)
