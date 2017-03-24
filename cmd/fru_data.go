@@ -27,8 +27,6 @@ debugging and system visibility.
 This command gives that data in a tabular format which can be used by the user to debug or validate
 system configurations. It currently does not allow changes to the collected data sets.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: add the API call to data collection
-		// fru/api/data/{taskID}
 		// Convert argument to REST call
 		fileContent, err := ioutil.ReadFile(configFile)
 		if err != nil {

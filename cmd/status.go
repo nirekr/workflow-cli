@@ -34,7 +34,8 @@ up and running. Does not provide information about VxRack system.`,
 			log.Fatal(err)
 		}
 
-		resp, err := utils.GetStatus(urlObject)
+		urlObject.Path = "about"
+		resp, err := utils.GetURL(urlObject)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}

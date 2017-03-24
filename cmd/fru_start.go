@@ -43,7 +43,7 @@ left off`,
 			log.Warnf("Error starting FRU task: %s", err)
 		}
 
-		err = frutaskrunner.RunTask(r)
+		err = frutaskrunner.RunTask(r, urlObject.String())
 		if err != nil {
 			log.Warnf("Error running FRU task: %s", err)
 		}

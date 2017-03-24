@@ -1,6 +1,9 @@
 package cmd_test
 
 import (
+	"flag"
+	"time"
+
 	"github.com/dellemc-symphony/workflow-cli/mock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -8,6 +11,12 @@ import (
 
 	"testing"
 )
+
+var https bool
+
+func init() {
+	flag.BoolVar(&https, "https", false, "Set 'true' to enable HTTPS for mock REST endpoint")
+}
 
 func TestCmd(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -17,7 +26,8 @@ func TestCmd(t *testing.T) {
 var router *gin.Engine
 
 var _ = BeforeSuite(func() {
-	go mock.CreateMock()
+	mock.CreateMock(https)
+	time.Sleep(25 * time.Millisecond)
 })
 
 var _ = AfterSuite(func() {

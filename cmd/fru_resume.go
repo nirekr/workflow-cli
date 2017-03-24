@@ -7,17 +7,20 @@ package cmd
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/dellemc-symphony/workflow-cli/frutaskrunner"
 	"github.com/dellemc-symphony/workflow-cli/models"
+	"github.com/dellemc-symphony/workflow-cli/transport"
 	"github.com/dellemc-symphony/workflow-cli/utils"
 
-	cleanhttp "github.com/hashicorp/go-cleanhttp"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -33,10 +36,25 @@ running task if there is only 1.
 Use this command to resume a failed or stopped workflow operation.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
+		fileContent, err := ioutil.ReadFile(configFile)
+		if err != nil {
+			log.Fatalf("Error reading config file: %s", err)
+		}
+		// Unmarshal data and print
+		urlObject := url.URL{}
+		err = json.Unmarshal(fileContent, &urlObject)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		// Do GET to /fru/api/workflow
-		client := cleanhttp.DefaultClient()
-		log.Printf("Server target is %s\n", target)
-		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf(target+"/fru/api/workflow"), nil)
+		client, err := transport.NewClient(urlObject.String())
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+
+		log.Printf("Server target is %s", urlObject.String())
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf(urlObject.String()+"/fru/api/workflow"), nil)
 		if err != nil {
 			log.Warnf("%s", err)
 		}
@@ -84,7 +102,7 @@ Use this command to resume a failed or stopped workflow operation.`,
 		resumeID := uriSplit[len(uriSplit)-1]
 
 		// Do GET to /fru/api/workflow/{task-id} to get response
-		req1, err := http.NewRequest(http.MethodGet, fmt.Sprintf(target+"/fru/api/workflow/%s", resumeID), nil)
+		req1, err := http.NewRequest(http.MethodGet, fmt.Sprintf(urlObject.String()+"/fru/api/workflow/%s", resumeID), nil)
 		if err != nil {
 			log.Warnf("%s", err)
 		}
@@ -105,11 +123,7 @@ Use this command to resume a failed or stopped workflow operation.`,
 			log.Warnf("Decoding Response: %s", err)
 		}
 
-		//log.Infof("req1 is %+v\n", req1)
-		//log.Infof("resp1 is %+v\n", resp1)
-		//log.Infof("r is %+v\n", r)
-
-		err = frutaskrunner.RunTask(r)
+		err = frutaskrunner.RunTask(r, urlObject.String())
 		if err != nil {
 			log.Warnf("Error running FRU task: %s", err)
 		}

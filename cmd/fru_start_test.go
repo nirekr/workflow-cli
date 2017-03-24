@@ -12,33 +12,36 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("FruStart", func() {
 	var binLocation string
 	var StateFile string
-	var server *ghttp.Server
+	var target string
 
 	BeforeEach(func() {
-		server = ghttp.NewServer()
 		binLocation = fmt.Sprintf("../bin/%s/workflow-cli", runtime.GOOS)
 		dir, err := homedir.Dir()
 		Expect(err).ToNot(HaveOccurred())
 		StateFile = fmt.Sprintf("%s/.cli", dir)
 
+		if https {
+			target = "https://localhost:8080"
+		} else {
+			target = "http://localhost:8080"
+		}
+
+		cmd := exec.Command(binLocation, "target", target)
+		err = cmd.Run()
+		Expect(err).To(BeNil())
 	})
 	AfterEach(func() {
-		server.Close()
 		os.Remove(StateFile)
 	})
 
 	Context("When command is called", func() {
 		It("UNIT should run the 'fru start' command successfully", func() {
-			cmd := exec.Command(binLocation, "target", "http://localhost:8080")
-			cmd.Run()
-
-			cmd = exec.Command(binLocation, "fru", "start")
+			cmd := exec.Command(binLocation, "fru", "start")
 
 			stdin, err := cmd.StdinPipe()
 			Expect(err).To(BeNil())

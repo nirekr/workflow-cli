@@ -14,7 +14,8 @@ import (
 )
 
 var configFile string
-var target string
+
+//var target string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -38,15 +39,10 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	RootCmd.PersistentFlags().StringVar(&target, "target", "http://localhost:8080", "target gateway endpoint")
 	RootCmd.PersistentFlags().StringVar(&configFile, "config", "default", "config file (default is $HOME/.cli)")
 }
 
-// initConfig reads in config file and ENV variables if set.
 func initConfig() {
-
-	//viper.SetConfigName(".cli")  // name of config file (without extension)
-	//viper.AddConfigPath("$HOME") // adding home directory as first search path
 	viper.AutomaticEnv() // read in environment variables that match
 
 	if configFile == "default" {

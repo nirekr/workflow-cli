@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"runtime"
 	"time"
 
 	"github.com/dellemc-symphony/workflow-cli/frutaskrunner"
+	homedir "github.com/mitchellh/go-homedir"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,13 +19,32 @@ import (
 var _ = Describe("FruResume", func() {
 
 	var binLocation string
+	var target string
+	var StateFile string
 	BeforeEach(func() {
+		dir, err := homedir.Dir()
+		Expect(err).ToNot(HaveOccurred())
+		StateFile = fmt.Sprintf("%s/.cli", dir)
+
 		binLocation = fmt.Sprintf("../bin/%s/workflow-cli", runtime.GOOS)
+		if https {
+			target = "https://localhost:8080"
+		} else {
+			target = "http://localhost:8080"
+		}
+
+		cmd := exec.Command(binLocation, "target", target)
+		err = cmd.Run()
+		Expect(err).To(BeNil())
+
+	})
+	AfterEach(func() {
+		os.Remove(StateFile)
 	})
 
 	Context("When command is called", func() {
 		It("UNIT should print called message", func() {
-			_, err := frutaskrunner.InitiateWorkflow("http://localhost:8080")
+			_, err := frutaskrunner.InitiateWorkflow(target)
 			Expect(err).To(BeNil())
 
 			cmd := exec.Command(binLocation, "fru", "resume")

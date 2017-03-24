@@ -9,19 +9,23 @@ import (
 
 	"github.com/dellemc-symphony/workflow-cli/auth"
 	"github.com/dellemc-symphony/workflow-cli/models"
+	"github.com/dellemc-symphony/workflow-cli/transport"
 	"github.com/dellemc-symphony/workflow-cli/utils"
-	cleanhttp "github.com/hashicorp/go-cleanhttp"
 	log "github.com/sirupsen/logrus"
 )
 
 // RunTask starts the logic to run tasks and act on the results
-func RunTask(r models.Response) error {
+func RunTask(r models.Response, target string) error {
 
 	if len(r.Links) == 0 {
 		return fmt.Errorf("Server error: No next-step or retry-step received")
 	}
 
-	client := cleanhttp.DefaultClient()
+	client, err := transport.NewClient(target)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
 	for {
 		var index int
 		for i, link := range r.Links {
@@ -137,7 +141,10 @@ func RunTask(r models.Response) error {
 // InitiateWorkflow starts the workflow
 func InitiateWorkflow(target string) (models.Response, error) {
 
-	client := cleanhttp.DefaultClient()
+	client, err := transport.NewClient(target)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
 
 	quantaReplace := models.WorkflowRequest{
 		Workflow: "quanta-replacement-d51b-esxi",
@@ -149,7 +156,7 @@ func InitiateWorkflow(target string) (models.Response, error) {
 
 	}
 
-	log.Printf("Server target is %s\n", target)
+	log.Printf("Server target is %s", target)
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf(target+"/fru/api/workflow"), body)
 	if err != nil {
 		return models.Response{}, fmt.Errorf("Error creating new request: %s", err)

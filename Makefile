@@ -40,17 +40,20 @@ deps:
 	glide install
 	env GOOS=windows go get -d ./...
 
-integration-test: build
-	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bINTEGRATION\b"
-
-unit-test: build
-	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bUNIT\b"
-
-mock: build
+mock: build-Linux
 	go run mock/main/main.go
 
+integration-test: build
+	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bINTEGRATION\b" -- --https=false
+	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bINTEGRATION\b" -- --https=true
+
+unit-test: build
+	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bUNIT\b" -- --https=false
+	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bUNIT\b" -- --https=true
+
 test: build
-	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30
+	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 -- --https=false
+	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 -- --https=true
 
 cover-cmd: test
 	go tool cover -html=cmd/cmd.coverprofile

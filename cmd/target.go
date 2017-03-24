@@ -58,7 +58,7 @@ ex.: workflow-cli fru target http://192.168.1.1:80`,
 				fmt.Printf("Current target is ")
 				fmt.Printf("%s://%s\n", urlObject.Scheme, urlObject.Host)
 			} else {
-				log.Warnf("No target set %s", err)
+				log.Warnf("No target set: %s", err)
 				return
 			}
 		} else {
@@ -74,11 +74,13 @@ ex.: workflow-cli fru target http://192.168.1.1:80`,
 				return
 			}
 
-			_, err = utils.GetStatus(*targetURL)
+			targetURL.Path = "about"
+			_, err = utils.GetURL(*targetURL)
 			if err != nil {
 				log.Warnf(err.Error())
 				return
 			}
+			targetURL.Path = ""
 
 			fmt.Printf("Target set to %s://%s\n", targetURL.Scheme, targetURL.Host)
 

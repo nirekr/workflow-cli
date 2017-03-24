@@ -3,10 +3,13 @@ package mock
 import (
 	"fmt"
 	"net/http"
+	"path/filepath"
+	"runtime"
 
 	"github.com/braintree/manners"
 	"github.com/dellemc-symphony/workflow-cli/models"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 // StopMock stops the Server
@@ -15,7 +18,7 @@ func StopMock() {
 }
 
 // CreateMock starts a mock REST Endpoint for the FRU workflow
-func CreateMock() {
+func CreateMock(https bool) {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	id := "123abc-456def-789ghi"
@@ -40,9 +43,16 @@ func CreateMock() {
 	})
 
 	router.POST("/fru/api/workflow", func(c *gin.Context) {
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/vcenter-endpoint", "https://", id)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/vcenter-endpoint", "http://", id)
+		}
+
 		stepNext := models.Link{
 			Rel:    "step-next",
-			Href:   fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/vcenter-endpoint", "http://", id),
+			Href:   url,
 			Type:   "application/vnd.dellemc.vcenter.endpoint+json",
 			Method: "POST",
 		}
@@ -61,8 +71,15 @@ func CreateMock() {
 	})
 
 	router.GET("/fru/api/workflow", func(c *gin.Context) {
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s", "https://", id)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s", "http://", id)
+		}
+
 		workflow := models.Workflow{
-			URI: fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s", "http://", id),
+			URI: url,
 		}
 
 		workflows := models.Workflows{workflow}
@@ -72,9 +89,16 @@ func CreateMock() {
 	})
 
 	router.GET("/fru/api/workflow/:trackingid", func(c *gin.Context) {
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/vcenter-endpoint", "https://", id)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/vcenter-endpoint", "http://", id)
+		}
+
 		stepNext := models.Link{
 			Rel:    "step-next",
-			Href:   fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/vcenter-endpoint", "http://", id),
+			Href:   url,
 			Type:   "application/vnd.dellemc.vcenter.endpoint+json",
 			Method: "POST",
 		}
@@ -99,10 +123,16 @@ func CreateMock() {
 		// Validate JSON Body
 		var vcenterCreds models.Endpoint
 		if c.BindJSON(&vcenterCreds) == nil {
+			var url string
+			if https {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/scaleio-endpoint", "https://", id)
+			} else {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/scaleio-endpoint", "http://", id)
+			}
 
 			stepNext := models.Link{
 				Rel:    "step-next",
-				Href:   fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/scaleio-endpoint", "http://", id),
+				Href:   url,
 				Type:   "application/vnd.dellemc.scaleio.endpoint+json",
 				Method: "POST",
 			}
@@ -127,10 +157,16 @@ func CreateMock() {
 		// Validate JSON Body
 		var scaleioCreds models.Endpoint
 		if c.BindJSON(&scaleioCreds) == nil {
+			var url string
+			if https {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/start-data-collection", "https://", id)
+			} else {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/start-data-collection", "http://", id)
+			}
 
 			stepNext := models.Link{
 				Rel:    "step-next",
-				Href:   fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/start-data-collection", "http://", id),
+				Href:   url,
 				Type:   "application/json",
 				Method: "POST",
 			}
@@ -155,20 +191,32 @@ func CreateMock() {
 		if retry == true {
 			retry = false
 			id = c.Param("trackingid")
+			var url string
+			if https {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/start-data-collection", "https://", id)
+			} else {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/start-data-collection", "http://", id)
+			}
 
 			stepNext = models.Link{
 				Rel:    "step-retry",
-				Href:   fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/start-data-collection", "http://", id),
+				Href:   url,
 				Type:   "application/json",
 				Method: "POST",
 			}
 
 		} else {
 			id = c.Param("trackingid")
+			var url string
+			if https {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/verify-data-collection", "https://", id)
+			} else {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/verify-data-collection", "http://", id)
+			}
 
 			stepNext = models.Link{
 				Rel:    "step-next",
-				Href:   fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/verify-data-collection", "http://", id),
+				Href:   url,
 				Type:   "application/json",
 				Method: "GET",
 			}
@@ -212,5 +260,17 @@ func CreateMock() {
 
 	})
 
-	manners.ListenAndServe(":8080", router)
+	if https {
+		// Find path to certs file. Should always be in same dir as mock.go
+		_, filename, _, _ := runtime.Caller(0)
+		dir, err := filepath.Abs(filepath.Dir(filename))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		go manners.ListenAndServeTLS(":8080", dir+"/cert.pem", dir+"/key.pem", router)
+
+	} else {
+		go manners.ListenAndServe(":8080", router)
+	}
 }
