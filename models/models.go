@@ -8,9 +8,9 @@ const (
 
 // Endpoint is a struct ...
 type Endpoint struct {
-	Endpoint string `json:"endpoint"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	EndpointURL string `json:"endpointUrl"`
+	Username    string `json:"username"`
+	Password    string `json:"password"`
 }
 
 // Response is a struct ...

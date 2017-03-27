@@ -53,12 +53,12 @@ func RunTask(r models.Response, target string) error {
 			authTarget := typeSplit[len(typeSplit)-2]
 
 			// Call auth
-			endpoint, userName, password, err := auth.TargetAuth(authTarget)
+			endpointURL, userName, password, err := auth.TargetAuth(authTarget)
 			if err != nil {
 				log.Warnf("error getting creds: %s", err)
 			}
 
-			endpointBody.Endpoint = endpoint
+			endpointBody.EndpointURL = endpointURL
 			endpointBody.Username = userName
 			endpointBody.Password = password
 
