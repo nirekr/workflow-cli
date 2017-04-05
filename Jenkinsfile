@@ -17,7 +17,7 @@ pipeline {
                     mkdir -p /go/src/github.com/dellemc-symphony/workflow-cli
                     cp -r . /go/src/github.com/dellemc-symphony/workflow-cli/
                     cd /go/src/github.com/dellemc-symphony/workflow-cli/
-                   
+
                     make creds
                     make deps
                 '''
@@ -47,7 +47,8 @@ pipeline {
                 sh '''
                     go get -u github.com/aktau/github-release
                     cd /go/src/github.com/dellemc-symphony/workflow-cli/
-                    tar -czvf release-v0.0.1-${BUILD_ID}.tar.gz bin/
+                    make build
+                    tar -czvf release-v0.0.1-${BUILD_ID}.tgz bin/
                     github-release release \
                         --user dellemc-symphony \
                         --repo workflow-cli \

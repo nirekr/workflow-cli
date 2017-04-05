@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"os"
 
+	homedir "github.com/mitchellh/go-homedir"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -46,7 +48,10 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	if configFile == "default" {
-		home := viper.Get("HOME")
+		home, err := homedir.Dir()
+		if err != nil {
+			log.Fatalf("Could not read HOME directory: %s", err.Error())
+		}
 		configFile = fmt.Sprintf("%s/.cli", home)
 
 	}

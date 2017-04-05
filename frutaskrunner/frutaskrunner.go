@@ -56,6 +56,7 @@ func RunTask(r models.Response, target string) error {
 			endpointURL, userName, password, err := auth.TargetAuth(authTarget)
 			if err != nil {
 				log.Warnf("error getting creds: %s", err)
+				return err
 			}
 
 			endpointBody.EndpointURL = endpointURL

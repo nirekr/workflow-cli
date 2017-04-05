@@ -43,25 +43,25 @@ func TargetAuth(target string) (string, string, string, error) {
 
 	// Get Password
 	fmt.Printf("Enter %s Password: ", target)
-	password, err := terminal.ReadPassword(int(syscall.Stdin))
+	var password string
 
-	if err != nil {
-		log.Warnf("Error reading password: %s", err)
-		return "", "", "", err
+	if terminal.IsTerminal(int(syscall.Stdin)) {
+		passwordBytes, err := terminal.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			log.Warnf("\nError reading password: %s", err)
+			return "", "", "", err
+		}
+		password = string(passwordBytes)
+
+	} else {
+		password = scanner.Text()
+
+		if err := scanner.Err(); err != nil {
+			log.Warnf("\nError reading password: %s", err)
+			return "", "", "", err
+		}
 	}
-	fmt.Printf("\n")
 
-	return endpoint, userName, string(password), nil
+	return endpoint, userName, password, nil
 
-	// fmt.Printf("Enter %s Password: ", target)
-	// fmt.Print("\033[8m") // Hide input
-	// scanner.Scan()
-	// password := scanner.Text()
-	// fmt.Print("\033[28m") // Show input
-	//
-	// if err := scanner.Err(); err != nil {
-	// 	log.Warnf("Error reading password: %s", err)
-	// 	return "", "", "", err
-	// }
-	//return endpoint, userName, password, nil
 }

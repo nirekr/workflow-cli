@@ -43,15 +43,15 @@ deps:
 mock: build-Linux
 	go run mock/main/main.go
 
-integration-test: build
+integration-test: build-Linux
 	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bINTEGRATION\b" -- --https=false
 	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bINTEGRATION\b" -- --https=true
 
-unit-test: build
+unit-test: build-Linux
 	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bUNIT\b" -- --https=false
 	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bUNIT\b" -- --https=true
 
-test: build
+test: build-Linux
 	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 -- --https=false
 	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 -- --https=true
 
