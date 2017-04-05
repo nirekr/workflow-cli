@@ -48,19 +48,38 @@ pipeline {
                     go get -u github.com/aktau/github-release
                     cd /go/src/github.com/dellemc-symphony/workflow-cli/
                     make build
-                    tar -czvf release-v0.0.1-${BUILD_ID}.tgz bin/
+
+                    tar -czvf release-v0.0.1-${BUILD_ID}-windows.tgz bin/windows
+                    tar -czvf release-v0.0.1-${BUILD_ID}-mac.tgz bin/darwin
+                    tar -czvf release-v0.0.1-${BUILD_ID}-linux.tgz bin/linux
+
                     github-release release \
                         --user dellemc-symphony \
                         --repo workflow-cli \
                         --tag v0.0.1-${BUILD_ID} \
                         --name "Workflow CLI Release" \
                         --description "Workflow CLI Release"
+
                     github-release upload \
                         --user dellemc-symphony \
                         --repo workflow-cli \
                         --tag v0.0.1-${BUILD_ID} \
-                        --name "WorkflowCLI.tgz" \
-                        --file release-v0.0.1-${BUILD_ID}.tgz
+                        --name "WorkflowCLI-Windows.tgz" \
+                        --file release-v0.0.1-${BUILD_ID}-windows.tgz
+
+                    github-release upload \
+                        --user dellemc-symphony \
+                        --repo workflow-cli \
+                        --tag v0.0.1-${BUILD_ID} \
+                        --name "WorkflowCLI-Mac.tgz" \
+                        --file release-v0.0.1-${BUILD_ID}-mac.tgz
+
+                    github-release upload \
+                        --user dellemc-symphony \
+                        --repo workflow-cli \
+                        --tag v0.0.1-${BUILD_ID} \
+                        --name "WorkflowCLI-Linux.tgz" \
+                        --file release-v0.0.1-${BUILD_ID}-linux.tgz
                 '''
             }
         }
