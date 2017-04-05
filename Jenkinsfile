@@ -59,8 +59,8 @@ pipeline {
                         --user dellemc-symphony \
                         --repo workflow-cli \
                         --tag v0.0.1-${BUILD_ID} \
-                        --name "WorkflowCLI.tar.gz" \
-                        --file release-v0.0.1-${BUILD_ID}.tar.gz
+                        --name "WorkflowCLI.tgz" \
+                        --file release-v0.0.1-${BUILD_ID}.tgz
                 '''
             }
         }
