@@ -40,31 +40,37 @@ deps:
 	glide install
 	env GOOS=windows go get -d ./...
 
-mock: build-Linux
+mock: build-linux
 	go run mock/main/main.go
 
-integration-test: build-Linux
+integration-test: build-linux
 	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bINTEGRATION\b" -- --https=false
 	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bINTEGRATION\b" -- --https=true
+	cp resources/endpoint_template.yaml $(GOOUT)/linux/endpoint.yaml
 
-unit-test: build-Linux
+unit-test: build-linux
 	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bUNIT\b" -- --https=false
 	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bUNIT\b" -- --https=true
+	cp resources/endpoint_template.yaml $(GOOUT)/linux/endpoint.yaml
 
-test: build-Linux
+test: build-linux
 	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 -- --https=false
 	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 -- --https=true
+	cp resources/endpoint_template.yaml $(GOOUT)/linux/endpoint.yaml
 
 cover-cmd: test
 	go tool cover -html=cmd/cmd.coverprofile
 
-build: build-Linux build-Mac build-Windows
+build: build-linux build-mac build-windows
 
-build-Linux:
+build-linux:
 	env GOOS=linux go build -o $(GOOUT)/linux/$(BINARYNAME) $(LDFLAGS)
+	cp resources/endpoint_template.yaml $(GOOUT)/linux/endpoint.yaml
 
-build-Mac:
+build-mac:
 	env GOOS=darwin go build -o $(GOOUT)/darwin/$(BINARYNAME) $(LDFLAGS)
+	cp resources/endpoint_template.yaml $(GOOUT)/darwin/endpoint.yaml
 
-build-Windows:
+build-windows:
 	env GOOS=windows go build -o $(GOOUT)/windows/$(BINARYNAME).exe $(LDFLAGS)
+	cp resources/endpoint_template.yaml $(GOOUT)/windows/endpoint.yaml
