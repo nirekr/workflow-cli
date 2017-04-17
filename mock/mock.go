@@ -24,12 +24,14 @@ func CreateMock(https bool) {
 	id := "123abc-456def-789ghi"
 	retry := true
 
+	// About corresponds to the "status" command
 	router.GET("/fru/api/about", func(c *gin.Context) {
 
 		c.String(http.StatusOK, "up and running")
 
 	})
 
+	//Data returns info from Data Collection
 	router.GET("/fru/api/data/:taskid", func(c *gin.Context) {
 		taskid := c.Param("taskid")
 
@@ -42,34 +44,7 @@ func CreateMock(https bool) {
 
 	})
 
-	router.POST("/fru/api/workflow", func(c *gin.Context) {
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/vcenter-endpoint", "https://", id)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/vcenter-endpoint", "http://", id)
-		}
-
-		stepNext := models.Link{
-			Rel:    "step-next",
-			Href:   url,
-			Type:   "application/vnd.dellemc.vcenter.endpoint+json",
-			Method: "POST",
-		}
-
-		links := models.Links{stepNext}
-
-		response := models.Response{
-			ID:          id,
-			Workflow:    "quanta-replacement-d51b-esxi",
-			CurrentStep: "Initiate Workflow",
-			Links:       links,
-		}
-
-		c.JSON(http.StatusCreated, response)
-
-	})
-
+	// GET on /workflow returns list of partially completed workflows (for Resume command)
 	router.GET("/fru/api/workflow", func(c *gin.Context) {
 		var url string
 		if https {
@@ -88,6 +63,7 @@ func CreateMock(https bool) {
 
 	})
 
+	// This resumes a partially completes workflow. trackingID comes from GET /workflow
 	router.GET("/fru/api/workflow/:trackingid", func(c *gin.Context) {
 		var url string
 		if https {
@@ -108,7 +84,7 @@ func CreateMock(https bool) {
 		response := models.Response{
 			ID:          id,
 			Workflow:    "quanta-replacement-d51b-esxi",
-			CurrentStep: "Initiate Workflow",
+			CurrentStep: "vcenter-endpoint",
 			Links:       links,
 		}
 
@@ -116,18 +92,141 @@ func CreateMock(https bool) {
 
 	})
 
-	// Step 2
+	steps := make(map[string]string)
+	steps[""] = "rackhd-endpoint"
+	steps["rackhd-endpoint"] = "coprhd-endpoint"
+	steps["coprhd-endpoint"] = "vcenter-endpoint"
+	steps["vcenter-endpoint"] = "scaleio-endpoint"
+	steps["scaleio-endpoint"] = "start-scaleio-data-collection"
+	steps["start-scaleio-data-collection"] = "start-vcenter-data-collection"
+	steps["start-vcenter-data-collection"] = "present-system-list"
+	steps["present-system-list"] = "start-scaleio-remove-workflow"
+	steps["start-scaleio-remove-workflow"] = "wait-for-scaleio-workflow"
+	steps["wait-for-scaleio-workflow"] = "power-off-scaleio-vm"
+	steps["power-off-scaleio-vm"] = "enter-maintanence-mode"
+	steps["enter-maintanence-mode"] = "reboot-host-for-discovery"
+	steps["reboot-host-for-discovery"] = "wait-for-rackhd-discovery"
+	steps["wait-for-rackhd-discovery"] = "instruct-physical-removal"
+	steps["instruct-physical-removal"] = "wait-for-rackhd-discovery2"
+	steps["wait-for-rackhd-discovery2"] = "present-system-list2"
+	steps["present-system-list2"] = "configure-disks-rackhd"
+	steps["configure-disks-rackhd"] = "install-esxi"
+	steps["install-esxi"] = "add-host-to-vcenter"
+	steps["add-host-to-vcenter"] = "install-scaleio-vib"
+	steps["install-scaleio-vib"] = "exit-vcenter-maintenance-mode"
+	steps["exit-vcenter-maintenance-mode"] = "deploy-svm"
+	steps["deploy-svm"] = "wait-for-svm-deploy"
+	steps["wait-for-svm-deploy"] = "start-scaleio-add-workflow"
+	steps["start-scaleio-add-workflow"] = "wait-for-scaleio-add-complete"
+	steps["wait-for-scaleio-add-complete"] = "map-scaleio-volumes-to-host"
+	steps["map-scaleio-volumes-to-host"] = "NONE"
+
+	// Initiates the workflow
+	router.POST("/fru/api/workflow", func(c *gin.Context) {
+		var url string
+		nextStep := steps[""]
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/vnd.dellemc.rackhd.endpoint+json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "Initiate Workflow",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/rackhd-endpoint", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["rackhd-endpoint"]
+		// Validate JSON Body
+		var rackhdCreds models.Endpoint
+		if c.BindJSON(&rackhdCreds) == nil {
+			var url string
+			if https {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+			} else {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+			}
+
+			stepNext := models.Link{
+				Rel:    "step-next",
+				Href:   url,
+				Type:   "application/vnd.dellemc.coprhd.endpoint+json",
+				Method: "POST",
+			}
+
+			links := models.Links{stepNext}
+
+			response := models.Response{
+				ID:          id,
+				Workflow:    "quanta-replacement-d51b-esxi",
+				CurrentStep: "rackhd-endpoint",
+				Links:       links,
+			}
+
+			c.JSON(http.StatusCreated, response)
+		}
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/coprhd-endpoint", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["coprhd-endpoint"]
+		// Validate JSON Body
+		var coprhdCreds models.Endpoint
+		if c.BindJSON(&coprhdCreds) == nil {
+			var url string
+			if https {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+			} else {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+			}
+
+			stepNext := models.Link{
+				Rel:    "step-next",
+				Href:   url,
+				Type:   "application/vnd.dellemc.vcenter.endpoint+json",
+				Method: "POST",
+			}
+
+			links := models.Links{stepNext}
+
+			response := models.Response{
+				ID:          id,
+				Workflow:    "quanta-replacement-d51b-esxi",
+				CurrentStep: "coprhd-endpoint",
+				Links:       links,
+			}
+
+			c.JSON(http.StatusCreated, response)
+		}
+	})
+
 	router.POST("/fru/api/workflow/:trackingid/vcenter-endpoint", func(c *gin.Context) {
 		id = c.Param("trackingid")
-
+		nextStep := steps["vcenter-endpoint"]
 		// Validate JSON Body
 		var vcenterCreds models.Endpoint
 		if c.BindJSON(&vcenterCreds) == nil {
 			var url string
 			if https {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/scaleio-endpoint", "https://", id)
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
 			} else {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/scaleio-endpoint", "http://", id)
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
 			}
 
 			stepNext := models.Link{
@@ -142,7 +241,7 @@ func CreateMock(https bool) {
 			response := models.Response{
 				ID:          id,
 				Workflow:    "quanta-replacement-d51b-esxi",
-				CurrentStep: "capturevCenterEndpoint",
+				CurrentStep: "vcenter-endpoint",
 				Links:       links,
 			}
 
@@ -150,18 +249,17 @@ func CreateMock(https bool) {
 		}
 	})
 
-	// Step 3
 	router.POST("/fru/api/workflow/:trackingid/scaleio-endpoint", func(c *gin.Context) {
 		id = c.Param("trackingid")
-
+		nextStep := steps["scaleio-endpoint"]
 		// Validate JSON Body
 		var scaleioCreds models.Endpoint
 		if c.BindJSON(&scaleioCreds) == nil {
 			var url string
 			if https {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/start-data-collection", "https://", id)
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
 			} else {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/start-data-collection", "http://", id)
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
 			}
 
 			stepNext := models.Link{
@@ -176,7 +274,7 @@ func CreateMock(https bool) {
 			response := models.Response{
 				ID:          id,
 				Workflow:    "quanta-replacement-d51b-esxi",
-				CurrentStep: "capturevScaleioEndpoint",
+				CurrentStep: "scaleio-endpoint",
 				Links:       links,
 			}
 
@@ -184,18 +282,19 @@ func CreateMock(https bool) {
 		}
 	})
 
-	// Step 4
-	router.POST("/fru/api/workflow/:trackingid/start-data-collection", func(c *gin.Context) {
+	router.POST("/fru/api/workflow/:trackingid/start-scaleio-data-collection", func(c *gin.Context) {
 		var stepNext models.Link
+		nextStep := steps["start-scaleio-data-collection"]
 
+		// intentionally fail once to test retry
 		if retry == true {
 			retry = false
 			id = c.Param("trackingid")
 			var url string
 			if https {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/start-data-collection", "https://", id)
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
 			} else {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/start-data-collection", "http://", id)
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
 			}
 
 			stepNext = models.Link{
@@ -209,16 +308,16 @@ func CreateMock(https bool) {
 			id = c.Param("trackingid")
 			var url string
 			if https {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/verify-data-collection", "https://", id)
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
 			} else {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/verify-data-collection", "http://", id)
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
 			}
 
 			stepNext = models.Link{
 				Rel:    "step-next",
 				Href:   url,
 				Type:   "application/json",
-				Method: "GET",
+				Method: "POST",
 			}
 		}
 
@@ -227,7 +326,38 @@ func CreateMock(https bool) {
 		response := models.Response{
 			ID:          id,
 			Workflow:    "quanta-replacement-d51b-esxi",
-			CurrentStep: "startDataCollection",
+			CurrentStep: "start-scaleio-data-collection",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/start-vcenter-data-collection", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["start-vcenter-data-collection"]
+		// Validate JSON Body
+
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "start-vcenter-data-collection",
 			Links:       links,
 		}
 
@@ -235,29 +365,567 @@ func CreateMock(https bool) {
 
 	})
 
-	// Step 5
-	router.GET("/fru/api/workflow/:trackingid/verify-data-collection", func(c *gin.Context) {
+	router.POST("/fru/api/workflow/:trackingid/present-system-list", func(c *gin.Context) {
 		id = c.Param("trackingid")
+		nextStep := steps["present-system-list"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
 
-		returnedNode := models.Node{
-			ID:           "node01",
-			SerialNumber: "123456789",
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
 		}
-		returnedNode2 := models.Node{
-			ID:           "node02",
-			SerialNumber: "987654321",
-		}
-		nodes := models.Nodes{returnedNode, returnedNode2}
+
+		links := models.Links{stepNext}
 
 		response := models.Response{
 			ID:          id,
 			Workflow:    "quanta-replacement-d51b-esxi",
-			CurrentStep: "verifyDataCollection",
-			Nodes:       nodes,
+			CurrentStep: "present-system-list",
+			Links:       links,
 		}
 
 		c.JSON(http.StatusCreated, response)
+	})
 
+	router.POST("/fru/api/workflow/:trackingid/start-scaleio-remove-workflow", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["start-scaleio-remove-workflow"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "start-scaleio-remove-workflow",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/wait-for-scaleio-workflow", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["wait-for-scaleio-workflow"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "wait-for-scaleio-workflow",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/power-off-scaleio-vm", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["power-off-scaleio-vm"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "power-off-scaleio-vm",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/enter-maintanence-mode", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["enter-maintanence-mode"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "enter-maintanence-mode",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/reboot-host-for-discovery", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["reboot-host-for-discovery"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "reboot-host-for-discovery",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/wait-for-rackhd-discovery", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["wait-for-rackhd-discovery"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "wait-for-rackhd-discovery",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/instruct-physical-removal", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["instruct-physical-removal"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "instruct-physical-removal",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/wait-for-rackhd-discovery2", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["wait-for-rackhd-discovery2"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "wait-for-rackhd-discovery2",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/present-system-list2", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["present-system-list2"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "present-system-list2",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/configure-disks-rackhd", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["configure-disks-rackhd"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "configure-disks-rackhd",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/install-esxi", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["install-esxi"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "install-esxi",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/add-host-to-vcenter", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["add-host-to-vcenter"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "add-host-to-vcenter",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/install-scaleio-vib", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["install-scaleio-vib"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "install-scaleio-vib",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/exit-vcenter-maintenance-mode", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["exit-vcenter-maintenance-mode"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "exit-vcenter-maintenance-mode",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/deploy-svm", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["deploy-svm"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "deploy-svm",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/wait-for-svm-deploy", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["wait-for-svm-deploy"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "wait-for-svm-deploy",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/start-scaleio-add-workflow", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["start-scaleio-add-workflow"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "start-scaleio-add-workflow",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/wait-for-scaleio-add-complete", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["wait-for-scaleio-add-complete"]
+		var url string
+		if https {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+		} else {
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		}
+
+		stepNext := models.Link{
+			Rel:    "step-next",
+			Href:   url,
+			Type:   "application/json",
+			Method: "POST",
+		}
+
+		links := models.Links{stepNext}
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "wait-for-scaleio-add-complete",
+			Links:       links,
+		}
+
+		c.JSON(http.StatusCreated, response)
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/map-scaleio-volumes-to-host", func(c *gin.Context) {
+		id = c.Param("trackingid")
+
+		response := models.Response{
+			ID:          id,
+			Workflow:    "quanta-replacement-d51b-esxi",
+			CurrentStep: "map-scaleio-volumes-to-host",
+		}
+
+		c.JSON(http.StatusCreated, response)
 	})
 
 	if https {
@@ -269,7 +937,6 @@ func CreateMock(https bool) {
 		}
 
 		go manners.ListenAndServeTLS(":8080", dir+"/cert.pem", dir+"/key.pem", router)
-
 	} else {
 		go manners.ListenAndServe(":8080", router)
 	}

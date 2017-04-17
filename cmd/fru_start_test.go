@@ -93,6 +93,18 @@ var _ = Describe("FruStart", func() {
 			io.WriteString(stdin, "2\n")
 			time.Sleep(500 * time.Millisecond)
 
+			io.WriteString(stdin, "a\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "b\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "a\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "b\n")
+			time.Sleep(500 * time.Millisecond)
+
 			buf := new(bytes.Buffer)
 			buf.ReadFrom(stderr)
 			Expect(buf.String()).To(ContainSubstring("Workflow complete"))
@@ -127,6 +139,24 @@ var _ = Describe("FruStart", func() {
 			time.Sleep(500 * time.Millisecond)
 
 			io.WriteString(stdin, "c\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "1\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "2\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "3\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "1\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "2\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "3\n")
 			time.Sleep(500 * time.Millisecond)
 
 			io.WriteString(stdin, "1\n")
