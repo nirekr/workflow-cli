@@ -79,14 +79,14 @@ const missingEndpoints = `
 MinimumVersion: v0.0.1-32
 RackHD:
   endpoint:
-    - "https://10.10.10.10:9090"
+#    - "https://10.10.10.10:9090"
   username:
     - "admin"
   password:
     - "admin"
 CoprHD:
   endpoint:
-    - "https://10.10.10.10:9090"
+#    - "https://10.10.10.10:9090"
   username:
     - "admin"
   password:
