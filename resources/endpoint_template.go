@@ -114,16 +114,16 @@ RackHD:
   endpoint:
     - "https://10.10.10.10:9090"
   username:
-    - "admin"
+#    - "admin"
   password:
-    - "admin"
+#    - "admin"
 CoprHD:
   endpoint:
     - "https://10.10.10.10:9090"
   username:
-    - "admin"
+#    - "admin"
   password:
-    - "admin"
+#    - "admin"
 vCenter:
   endpoint:
     - "https://10.10.10.10:9090"

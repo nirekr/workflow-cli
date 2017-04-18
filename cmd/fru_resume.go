@@ -53,7 +53,7 @@ Use this command to resume a failed or stopped workflow operation.`,
 			log.Fatalf(err.Error())
 		}
 
-		log.Printf("Server target is %s", urlObject.String())
+		log.Printf("Server target is %s\n", urlObject.String())
 		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf(urlObject.String()+"/fru/api/workflow"), nil)
 		if err != nil {
 			log.Warnf("%s", err)

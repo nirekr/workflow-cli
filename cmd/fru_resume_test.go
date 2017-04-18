@@ -83,6 +83,18 @@ var _ = Describe("FruResume", func() {
 			io.WriteString(stdin, "1\n")
 			time.Sleep(500 * time.Millisecond)
 
+			io.WriteString(stdin, "2\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "2\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(500 * time.Millisecond)
+
 			errBuf := new(bytes.Buffer)
 			errBuf.ReadFrom(stderr)
 			Expect(errBuf.String()).To(ContainSubstring("Workflow complete"))

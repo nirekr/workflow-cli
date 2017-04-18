@@ -6,6 +6,12 @@ const (
 	StepRetry = "step-retry"
 )
 
+// Constants for node actions
+const (
+	ActionAddNode    = "Add Node"
+	ActionRemoveNode = "Remove Node"
+)
+
 // Endpoint is a struct ...
 type Endpoint struct {
 	EndpointURL string `json:"endpointUrl"`
@@ -32,8 +38,11 @@ type Link struct {
 
 // Node is a struct ...
 type Node struct {
-	ID           string `json:"id,omitempty"`
-	SerialNumber string `json:"serial-number,omitempty"`
+	Hostname     string `json:"hostname,omitempty"`
+	SerialNumber string `json:"serialNumber,omitempty"`
+	ManagementIP string `json:"mgmtIP,omitempty"`
+	Status       string `json:"status,omitempty"`
+	UUID         string `json:"uuid,omitempty"`
 }
 
 // MockDataResponse is a struct ...

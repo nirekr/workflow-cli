@@ -99,8 +99,8 @@ func CreateMock(https bool) {
 	steps["vcenter-endpoint"] = "scaleio-endpoint"
 	steps["scaleio-endpoint"] = "start-scaleio-data-collection"
 	steps["start-scaleio-data-collection"] = "start-vcenter-data-collection"
-	steps["start-vcenter-data-collection"] = "present-system-list"
-	steps["present-system-list"] = "start-scaleio-remove-workflow"
+	steps["start-vcenter-data-collection"] = "remove-node-selection"
+	steps["remove-node-selection"] = "start-scaleio-remove-workflow"
 	steps["start-scaleio-remove-workflow"] = "wait-for-scaleio-workflow"
 	steps["wait-for-scaleio-workflow"] = "power-off-scaleio-vm"
 	steps["power-off-scaleio-vm"] = "enter-maintanence-mode"
@@ -108,8 +108,8 @@ func CreateMock(https bool) {
 	steps["reboot-host-for-discovery"] = "wait-for-rackhd-discovery"
 	steps["wait-for-rackhd-discovery"] = "instruct-physical-removal"
 	steps["instruct-physical-removal"] = "wait-for-rackhd-discovery2"
-	steps["wait-for-rackhd-discovery2"] = "present-system-list2"
-	steps["present-system-list2"] = "configure-disks-rackhd"
+	steps["wait-for-rackhd-discovery2"] = "add-node-selection"
+	steps["add-node-selection"] = "configure-disks-rackhd"
 	steps["configure-disks-rackhd"] = "install-esxi"
 	steps["install-esxi"] = "add-host-to-vcenter"
 	steps["add-host-to-vcenter"] = "install-scaleio-vib"
@@ -348,50 +348,79 @@ func CreateMock(https bool) {
 		stepNext := models.Link{
 			Rel:    "step-next",
 			Href:   url,
-			Type:   "application/json",
+			Type:   "application/vnd.dellemc.nodes.list.remove+json",
 			Method: "POST",
 		}
 
 		links := models.Links{stepNext}
+
+		node1 := models.Node{
+			Hostname:     "node01",
+			SerialNumber: "1234567",
+			ManagementIP: "10.10.10.1",
+			Status:       "online",
+			UUID:         "213894yu924h6ao",
+		}
+
+		node2 := models.Node{
+			Hostname:     "node02",
+			SerialNumber: "98765432",
+			ManagementIP: "10.10.10.2",
+			Status:       "degraded",
+			UUID:         "654edcvbhnjki87",
+		}
+		node3 := models.Node{
+			Hostname:     "node03",
+			SerialNumber: "91827465",
+			ManagementIP: "10.10.10.3",
+			Status:       "online",
+			UUID:         "fdr56765redfghj",
+		}
+		nodes := models.Nodes{node1, node2, node3}
 
 		response := models.Response{
 			ID:          id,
 			Workflow:    "quanta-replacement-d51b-esxi",
 			CurrentStep: "start-vcenter-data-collection",
 			Links:       links,
+			Nodes:       nodes,
 		}
 
 		c.JSON(http.StatusCreated, response)
-
 	})
 
-	router.POST("/fru/api/workflow/:trackingid/present-system-list", func(c *gin.Context) {
+	router.POST("/fru/api/workflow/:trackingid/remove-node-selection", func(c *gin.Context) {
 		id = c.Param("trackingid")
-		nextStep := steps["present-system-list"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		nextStep := steps["remove-node-selection"]
+
+		var nodeToRemove models.Node
+		if c.BindJSON(&nodeToRemove) == nil {
+
+			var url string
+			if https {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+			} else {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+			}
+
+			stepNext := models.Link{
+				Rel:    "step-next",
+				Href:   url,
+				Type:   "application/json",
+				Method: "POST",
+			}
+
+			links := models.Links{stepNext}
+
+			response := models.Response{
+				ID:          id,
+				Workflow:    "quanta-replacement-d51b-esxi",
+				CurrentStep: "remove-node-selection",
+				Links:       links,
+			}
+
+			c.JSON(http.StatusCreated, response)
 		}
-
-		stepNext := models.Link{
-			Rel:    "step-next",
-			Href:   url,
-			Type:   "application/json",
-			Method: "POST",
-		}
-
-		links := models.Links{stepNext}
-
-		response := models.Response{
-			ID:          id,
-			Workflow:    "quanta-replacement-d51b-esxi",
-			CurrentStep: "present-system-list",
-			Links:       links,
-		}
-
-		c.JSON(http.StatusCreated, response)
 	})
 
 	router.POST("/fru/api/workflow/:trackingid/start-scaleio-remove-workflow", func(c *gin.Context) {
@@ -610,49 +639,78 @@ func CreateMock(https bool) {
 		stepNext := models.Link{
 			Rel:    "step-next",
 			Href:   url,
-			Type:   "application/json",
+			Type:   "application/vnd.dellemc.nodes.list.add+json",
 			Method: "POST",
 		}
 
 		links := models.Links{stepNext}
+
+		node1 := models.Node{
+			Hostname:     "node01",
+			SerialNumber: "1234567",
+			ManagementIP: "10.10.10.1",
+			Status:       "online",
+			UUID:         "213894yu924h6ao",
+		}
+		node2 := models.Node{
+			Hostname:     "node02",
+			SerialNumber: "98765432",
+			ManagementIP: "10.10.10.2",
+			Status:       "available",
+			UUID:         "654edcvbhnjki87",
+		}
+		node3 := models.Node{
+			Hostname:     "node03",
+			SerialNumber: "91827465",
+			ManagementIP: "10.10.10.3",
+			Status:       "online",
+			UUID:         "fdr56765redfghj",
+		}
+		nodes := models.Nodes{node1, node2, node3}
 
 		response := models.Response{
 			ID:          id,
 			Workflow:    "quanta-replacement-d51b-esxi",
 			CurrentStep: "wait-for-rackhd-discovery2",
 			Links:       links,
+			Nodes:       nodes,
 		}
 
 		c.JSON(http.StatusCreated, response)
 	})
 
-	router.POST("/fru/api/workflow/:trackingid/present-system-list2", func(c *gin.Context) {
+	router.POST("/fru/api/workflow/:trackingid/add-node-selection", func(c *gin.Context) {
 		id = c.Param("trackingid")
-		nextStep := steps["present-system-list2"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+		nextStep := steps["add-node-selection"]
+
+		var nodeToRemove models.Node
+		if c.BindJSON(&nodeToRemove) == nil {
+
+			var url string
+			if https {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+			} else {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+			}
+
+			stepNext := models.Link{
+				Rel:    "step-next",
+				Href:   url,
+				Type:   "application/json",
+				Method: "POST",
+			}
+
+			links := models.Links{stepNext}
+
+			response := models.Response{
+				ID:          id,
+				Workflow:    "quanta-replacement-d51b-esxi",
+				CurrentStep: "add-node-selection",
+				Links:       links,
+			}
+
+			c.JSON(http.StatusCreated, response)
 		}
-
-		stepNext := models.Link{
-			Rel:    "step-next",
-			Href:   url,
-			Type:   "application/json",
-			Method: "POST",
-		}
-
-		links := models.Links{stepNext}
-
-		response := models.Response{
-			ID:          id,
-			Workflow:    "quanta-replacement-d51b-esxi",
-			CurrentStep: "present-system-list2",
-			Links:       links,
-		}
-
-		c.JSON(http.StatusCreated, response)
 	})
 
 	router.POST("/fru/api/workflow/:trackingid/configure-disks-rackhd", func(c *gin.Context) {

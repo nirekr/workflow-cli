@@ -20,10 +20,28 @@ var _ = Describe("FruStart", func() {
 	var endpointLocation string
 	var StateFile string
 	var target string
+	var tableString string
+	var nodeSelection string
 
 	BeforeEach(func() {
 		binLocation = fmt.Sprintf("../bin/%s/workflow-cli", runtime.GOOS)
 		endpointLocation = fmt.Sprintf("../bin/%s/endpoint.yaml", runtime.GOOS)
+
+		tableString = `+--------+----------+---------------+------------+----------+
+| SELECT | HOSTNAME | SERIAL NUMBER |  MGMT IP   |  STATUS  |
++--------+----------+---------------+------------+----------+
+|      1 | node01   |       1234567 | 10.10.10.1 | online   |
+|      2 | node02   |      98765432 | 10.10.10.2 | degraded |
+|      3 | node03   |      91827465 | 10.10.10.3 | online   |
++--------+----------+---------------+------------+----------+
+`
+
+		nodeSelection = `+----------+---------------+------------+----------+
+| HOSTNAME | SERIAL NUMBER |  MGMT IP   |  STATUS  |
++----------+---------------+------------+----------+
+| node02   |      98765432 | 10.10.10.2 | degraded |
++----------+---------------+------------+----------+
+`
 
 		dir, err := homedir.Dir()
 		Expect(err).ToNot(HaveOccurred())
@@ -53,9 +71,41 @@ var _ = Describe("FruStart", func() {
 
 			cmd := exec.Command(binLocation, "fru", "start")
 
-			output, err := cmd.CombinedOutput()
+			stdin, err := cmd.StdinPipe()
 			Expect(err).To(BeNil())
-			Expect(output).To(ContainSubstring("Workflow complete"))
+			defer stdin.Close()
+
+			stdout, err := cmd.StdoutPipe()
+			Expect(err).To(BeNil())
+			defer stdout.Close()
+
+			stderr, err := cmd.StderrPipe()
+			Expect(err).To(BeNil())
+			defer stderr.Close()
+
+			cmd.Start()
+
+			io.WriteString(stdin, "2\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "2\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(500 * time.Millisecond)
+
+			errBuf := new(bytes.Buffer)
+			errBuf.ReadFrom(stderr)
+			outBuf := new(bytes.Buffer)
+			outBuf.ReadFrom(stdout)
+
+			Expect(err).To(BeNil())
+			Expect(outBuf.String()).To(ContainSubstring(tableString))
+			Expect(outBuf.String()).To(ContainSubstring(nodeSelection))
+			Expect(errBuf.String()).To(ContainSubstring("Workflow complete"))
 
 		})
 	})
@@ -81,10 +131,10 @@ var _ = Describe("FruStart", func() {
 
 			cmd.Start()
 
-			io.WriteString(stdin, "a\n")
+			io.WriteString(stdin, "1\n")
 			time.Sleep(500 * time.Millisecond)
 
-			io.WriteString(stdin, "b\n")
+			io.WriteString(stdin, "1\n")
 			time.Sleep(500 * time.Millisecond)
 
 			io.WriteString(stdin, "1\n")
@@ -93,21 +143,38 @@ var _ = Describe("FruStart", func() {
 			io.WriteString(stdin, "2\n")
 			time.Sleep(500 * time.Millisecond)
 
-			io.WriteString(stdin, "a\n")
+			io.WriteString(stdin, "1\n")
 			time.Sleep(500 * time.Millisecond)
 
-			io.WriteString(stdin, "b\n")
+			io.WriteString(stdin, "1\n")
 			time.Sleep(500 * time.Millisecond)
 
-			io.WriteString(stdin, "a\n")
+			io.WriteString(stdin, "1\n")
 			time.Sleep(500 * time.Millisecond)
 
-			io.WriteString(stdin, "b\n")
+			io.WriteString(stdin, "1\n")
 			time.Sleep(500 * time.Millisecond)
 
-			buf := new(bytes.Buffer)
-			buf.ReadFrom(stderr)
-			Expect(buf.String()).To(ContainSubstring("Workflow complete"))
+			io.WriteString(stdin, "2\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "2\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(500 * time.Millisecond)
+
+			errBuf := new(bytes.Buffer)
+			errBuf.ReadFrom(stderr)
+			outBuf := new(bytes.Buffer)
+			outBuf.ReadFrom(stdout)
+
+			Expect(outBuf.String()).To(ContainSubstring(tableString))
+			Expect(outBuf.String()).To(ContainSubstring(nodeSelection))
+			Expect(errBuf.String()).To(ContainSubstring("Workflow complete"))
 
 			cmd.Wait()
 
@@ -132,13 +199,13 @@ var _ = Describe("FruStart", func() {
 
 			cmd.Start()
 
-			io.WriteString(stdin, "a\n")
+			io.WriteString(stdin, "1\n")
 			time.Sleep(500 * time.Millisecond)
 
-			io.WriteString(stdin, "b\n")
+			io.WriteString(stdin, "1\n")
 			time.Sleep(500 * time.Millisecond)
 
-			io.WriteString(stdin, "c\n")
+			io.WriteString(stdin, "1\n")
 			time.Sleep(500 * time.Millisecond)
 
 			io.WriteString(stdin, "1\n")
@@ -168,10 +235,27 @@ var _ = Describe("FruStart", func() {
 			io.WriteString(stdin, "3\n")
 			time.Sleep(500 * time.Millisecond)
 
-			buf := new(bytes.Buffer)
-			buf.ReadFrom(stderr)
-			Expect(buf.String()).To(ContainSubstring("endpoint.yaml not found, will prompt user"))
-			Expect(buf.String()).To(ContainSubstring("Workflow complete"))
+			io.WriteString(stdin, "2\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "2\n")
+			time.Sleep(500 * time.Millisecond)
+
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(500 * time.Millisecond)
+
+			errBuf := new(bytes.Buffer)
+			errBuf.ReadFrom(stderr)
+			outBuf := new(bytes.Buffer)
+			outBuf.ReadFrom(stdout)
+
+			Expect(errBuf.String()).To(ContainSubstring("endpoint.yaml not found, will prompt user"))
+			Expect(outBuf.String()).To(ContainSubstring(tableString))
+			Expect(outBuf.String()).To(ContainSubstring(nodeSelection))
+			Expect(errBuf.String()).To(ContainSubstring("Workflow complete"))
 
 		})
 	})

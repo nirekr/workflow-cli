@@ -77,6 +77,7 @@ func TargetAuth(target string) (string, string, string, error) {
 				return "", "", "", err
 			}
 		}
+		fmt.Printf("\n")
 	}
 
 	return endpoint, username, password, nil

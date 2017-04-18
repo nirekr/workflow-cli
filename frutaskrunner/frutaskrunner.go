@@ -1,16 +1,20 @@
 package frutaskrunner
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/dellemc-symphony/workflow-cli/auth"
 	"github.com/dellemc-symphony/workflow-cli/models"
 	"github.com/dellemc-symphony/workflow-cli/transport"
 	"github.com/dellemc-symphony/workflow-cli/utils"
+	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -70,6 +74,29 @@ func RunTask(r models.Response, target string) error {
 				return fmt.Errorf("error encoding credentials body: %s", err)
 			}
 
+		} else if r.Links[index].Type == "application/vnd.dellemc.nodes.list.add+json" {
+			nodeSelected, err := PresentNodesToUser(models.ActionAddNode, r.Nodes)
+			if err != nil {
+				return err
+			}
+
+			postBody, err = utils.EncodeBody(nodeSelected)
+			if err != nil {
+				log.Warnf("Could not encode: %+v", nodeSelected)
+				return fmt.Errorf("error encoding credentials body: %s", err)
+			}
+
+		} else if r.Links[index].Type == "application/vnd.dellemc.nodes.list.remove+json" {
+			nodeSelected, err := PresentNodesToUser(models.ActionRemoveNode, r.Nodes)
+			if err != nil {
+				return err
+			}
+
+			postBody, err = utils.EncodeBody(nodeSelected)
+			if err != nil {
+				log.Warnf("Could not encode: %+v", nodeSelected)
+				return fmt.Errorf("error encoding credentials body: %s", err)
+			}
 		}
 
 		reqNext, err := http.NewRequest(r.Links[index].Method, r.Links[index].Href, postBody)
@@ -100,13 +127,6 @@ func RunTask(r models.Response, target string) error {
 			log.Warnf("Resp is %s\n", resp)
 			return fmt.Errorf("error decoding response: %s", err)
 
-		}
-
-		if len(r.Nodes) != 0 {
-			log.Printf("Received node data:")
-			for _, node := range r.Nodes {
-				fmt.Printf("  %+v\n", node)
-			}
 		}
 
 		for i, link := range r.Links {
@@ -157,7 +177,7 @@ func InitiateWorkflow(target string) (models.Response, error) {
 
 	}
 
-	log.Printf("Server target is %s", target)
+	log.Printf("Server target is %s\n", target)
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf(target+"/fru/api/workflow"), body)
 	if err != nil {
 		return models.Response{}, fmt.Errorf("Error creating new request: %s", err)
@@ -192,4 +212,75 @@ func InitiateWorkflow(target string) (models.Response, error) {
 	}
 
 	return r, nil
+}
+
+//PresentNodesToUser presents the user with a list of nodes and asks them to choose one
+func PresentNodesToUser(action string, nodes models.Nodes) (models.Node, error) {
+	var selector int
+	var err error
+	ok := false
+
+	for !ok {
+		// Print result
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"Select", "Hostname", "Serial Number", "Mgmt IP", "Status"})
+
+		for index, node := range nodes {
+			table.Append([]string{
+				fmt.Sprintf("%d", index+1),
+				node.Hostname,
+				node.SerialNumber,
+				node.ManagementIP,
+				node.Status,
+			})
+		}
+		table.Render()
+
+		// Ask which task to resume, by task-id
+		scanner := bufio.NewScanner(os.Stdin)
+		fmt.Printf("Select a node for action '%s': ", action)
+
+		scanner.Scan()
+		input := scanner.Text()
+		if err = scanner.Err(); err != nil {
+			return models.Node{}, fmt.Errorf("Error reading user input: %s", err)
+		}
+
+		selector, err = strconv.Atoi(input)
+		if err != nil {
+			return models.Node{}, fmt.Errorf("Error parsing user input: %s", err)
+		}
+
+		// subtract 1 because nodes is an array and we counted from 1 in the table
+		selectedNode := nodes[selector-1]
+
+		fmt.Printf("Node selected: \n")
+		selectedTable := tablewriter.NewWriter(os.Stdout)
+		selectedTable.SetHeader([]string{"Hostname", "Serial Number", "Mgmt IP", "Status"})
+		selectedTable.Append([]string{
+			selectedNode.Hostname,
+			selectedNode.SerialNumber,
+			selectedNode.ManagementIP,
+			selectedNode.Status,
+		})
+		selectedTable.Render()
+
+		fmt.Printf("\nIs this the correct node? [Y/N] or Q to quit: ")
+		scanner.Scan()
+
+		input = scanner.Text()
+		if err := scanner.Err(); err != nil {
+			return models.Node{}, fmt.Errorf("Error reading user input: %s", err)
+		}
+
+		if strings.ToLower(input) == "q" {
+			return models.Node{}, fmt.Errorf("User selected quit")
+		}
+		if strings.ToLower(input) == "y" {
+			ok = true
+		}
+
+	}
+
+	return nodes[selector], nil
 }
