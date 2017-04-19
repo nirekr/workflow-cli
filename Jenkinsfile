@@ -54,12 +54,13 @@ pipeline {
                               userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]])
                 }
 				
-		    sh "mkdir -p /go/nexB/nexb-output/"
-       
+		    sh "mkdir -p /go/nexB/nexb-output/"       
+//		    sh "sh /go/nexB/scancode --help"
+//                    sh "sh /go/nexB/scancode --format html ${WORKSPACE} /go/nexB/nexb-output/minimal.html"
+//		    sh "sh /go/nexB/scancode --format html-app ${WORKSPACE} /go/nexB/nexb-output/scancode_result.html"
 		    sh "sh /go/nexB/scancode --help"
-                    sh "sh /go/nexB/scancode --format html ${WORKSPACE} /go/nexB/nexb-output/minimal.html"
-		    sh "sh /go/nexB/scancode --format html-app ${WORKSPACE} /go/nexB/nexb-output/scancode_result.html"
-	       
+                    sh "sh /go/nexB/scancode --format html ${WORKSPACE} /go/nexB/nexb-output/workflow-cli.html"
+		    sh "sh /go/nexB/scancode --format html-app ${WORKSPACE} /go/nexB/nexb-output/workflow-cli-grap.html"	       
 	            sh "mv /go/nexB/nexb-output/ ${WORKSPACE}/"
 	       	    archiveArtifacts '**/nexb-output/**'
             }
