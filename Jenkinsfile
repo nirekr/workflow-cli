@@ -13,10 +13,6 @@ pipeline {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '30', artifactNumToKeepStr: '5', daysToKeepStr: '30', numToKeepStr: '5'))
         timestamps()
     }
-    tools {
-        maven 'linux-maven-3.3.9'
-        jdk 'linux-jdk1.8.0_102'
-    }
     stages {
         stage('Dependencies') {
             steps {
