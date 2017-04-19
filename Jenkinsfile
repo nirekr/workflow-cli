@@ -45,7 +45,7 @@ pipeline {
 //        }
          stage('NexB Scan') {
             steps {
-		    cd /go/
+		    sh "cd /go/"
                     checkout([$class: 'GitSCM', 
                               branches: [[name: '*/master']], 
                               doGenerateSubmoduleConfigurations: false, 
