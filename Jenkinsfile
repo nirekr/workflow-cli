@@ -27,22 +27,6 @@ pipeline {
                 '''
             }
         }
-//        stage('Unit Tests') {
-//            steps {
-//                sh '''
-//                    cd /go/src/github.com/dellemc-symphony/workflow-cli/
-//                    make unit-test
-//                '''
-//            }
-//        }
-//        stage('Integration Tests') {
-//            steps {
-//                sh '''
-//                    cd /go/src/github.com/dellemc-symphony/workflow-cli/
-//                    make integration-test
-//                '''
-//            }
-//        }
          stage('NexB Scan') {
             steps {
 		    sh "cd /go/"
@@ -52,15 +36,12 @@ pipeline {
                               extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'nexB']], 
                               submoduleCfg: [], 
                               userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]])
-		    sh "mkdir -p /go/nexB/nexb-output/"       
-//		    sh "sh /go/nexB/scancode --help"
-//                  sh "sh /go/nexB/scancode --format html ${WORKSPACE} /go/nexB/nexb-output/minimal.html"
-//		    sh "sh /go/nexB/scancode --format html-app ${WORKSPACE} /go/nexB/nexb-output/scancode_result.html"
-		    sh "go/nexB/scancode --help"
-                    sh "go/nexB/scancode --format html /go/src/github.com/dellemc-symphony/workflow-cli /go/nexB/nexb-output/workflow-cli.html"
-		    sh "go/nexB/scancode --format html-app /go/src/github.com/dellemc-symphony/workflow-cli/ /go/nexB/nexb-output/workflow-cli-grap.html"	       
+		    sh "mkdir -p nexB/nexb-output/"       
+		    sh "nexB/scancode --help"
+                    sh "nexB/scancode --format html /go/src/github.com/dellemc-symphony/workflow-cli /go/nexB/nexb-output/workflow-cli.html"
+		    sh "nexB/scancode --format html-app /go/src/github.com/dellemc-symphony/workflow-cli/ /go/nexB/nexb-output/workflow-cli-grap.html"	       
 //	            sh "mv /go/nexB/nexb-output/ ${WORKSPACE}/"
-	       	    archiveArtifacts '**/**/nexb-output/**'
+	       	    archiveArtifacts '**/nexb-output/**'
             }
         }
         stage('Third Party Audit') {
