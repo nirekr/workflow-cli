@@ -58,9 +58,9 @@ pipeline {
 //		    sh "sh /go/nexB/scancode --help"
 //                    sh "sh /go/nexB/scancode --format html ${WORKSPACE} /go/nexB/nexb-output/minimal.html"
 //		    sh "sh /go/nexB/scancode --format html-app ${WORKSPACE} /go/nexB/nexb-output/scancode_result.html"
-		    sh "sh /go/nexB/scancode --help"
-                    sh "sh /go/nexB/scancode --format html ${WORKSPACE} /go/nexB/nexb-output/workflow-cli.html"
-		    sh "sh /go/nexB/scancode --format html-app ${WORKSPACE} /go/nexB/nexb-output/workflow-cli-grap.html"	       
+		    sh "nexB/scancode --help"
+                    sh "nexB/scancode --format html ${WORKSPACE} /go/nexB/nexb-output/workflow-cli.html"
+		    sh "nexB/scancode --format html-app ${WORKSPACE} /go/nexB/nexb-output/workflow-cli-grap.html"	       
 	            sh "mv /go/nexB/nexb-output/ ${WORKSPACE}/"
 	       	    archiveArtifacts '**/nexb-output/**'
             }
