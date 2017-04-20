@@ -10,3 +10,7 @@ or
 
 **WARNING**
 The HTTPS certs included in this mock server were generated for testing ONLY by a non-secure script. Do NOT use in production or for securing real traffic.
+
+## Copyright
+Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+Dell EMC Confidential/Proprietary Information

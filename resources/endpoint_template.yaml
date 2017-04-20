@@ -1,3 +1,8 @@
+#
+# Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+# Dell EMC Confidential/Proprietary Information
+#
+
 # Endpoints for FRU-PAQX workflow
 ---
 MinimumVersion: v0.0.1-32

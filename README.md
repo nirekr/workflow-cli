@@ -59,3 +59,7 @@ Contribute code and make submissions at the relevant GitHub repository level. Se
 
 Reach out to us on Slack #symphony channel. Request an invite at http://community.codedellemc.com.
 You can also join [Google Groups] (https://groups.google.com/d/forum/dellemc-symphony) and start a discussion. 
+
+## Copyright
+Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+Dell EMC Confidential/Proprietary Information

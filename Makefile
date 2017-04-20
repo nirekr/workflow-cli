@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+# Dell EMC Confidential/Proprietary Information
+#
+#
+
 ORGANIZATION = cpsd
 PROJECT = workflow-cli
 BINARYNAME = workflow-cli
