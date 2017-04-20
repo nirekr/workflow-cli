@@ -3,11 +3,16 @@ pipeline {
         docker {
             image 'rackhd/golang:1.8.0'
             label 'maven-builder'
+	    customWorkspace "workspace/${env.JOB_NAME}"
         }
     }
     environment {
         GIT_CREDS = credentials('github-03')
         GITHUB_TOKEN = credentials('github-02')
+    }
+    options { 
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '30', artifactNumToKeepStr: '5', daysToKeepStr: '30', numToKeepStr: '5'))
+        timestamps()
     }
     stages {
         stage('Dependencies') {
@@ -23,7 +28,7 @@ pipeline {
                 '''
             }
         }
-        stage('Unit Tests') {
+	    stage('Unit Tests') {
             steps {
                 sh '''
                     cd /go/src/github.com/dellemc-symphony/workflow-cli/
@@ -39,9 +44,35 @@ pipeline {
                 '''
             }
         }
+        stage('NexB Scan') {
+            steps {
+                    checkout([$class: 'GitSCM', 
+                              branches: [[name: '*/master']], 
+                              doGenerateSubmoduleConfigurations: false, 
+                              extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'nexB']], 
+                              submoduleCfg: [], 
+                              userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]]) 
+		    checkout([$class: 'GitSCM', 
+			      branches: [[name: '*/master']], 
+			      doGenerateSubmoduleConfigurations: false, 
+			      extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'workflow-cli']], 
+			      gitTool: 'linux-git', 
+			      submoduleCfg: [], 
+			      userRemoteConfigs: [[credentialsId: 'github-03', url: 'https://github.com/dellemc-symphony/workflow-cli.git']]])
+
+		    sh "mkdir -p nexB/nexb-output/"
+       		    sh "nexB/scancode --help"
+                    sh "nexB/scancode --format html ${WORKSPACE}/workflow-cli nexB/nexb-output/workflow-cli.html"
+		    sh "nexB/scancode --format html-app ${WORKSPACE}/workflow-cli nexB/nexb-output/workflow-cli-grap.html"
+//	            sh "mv nexB/nexb-output/ ${WORKSPACE}/"
+	       	    archiveArtifacts '**/nexb-output/**' 
+            }
+        }
         stage('Release') {
             when {
-                environment name: "JOB_NAME", value: "workflow-cli-master"
+                expression {
+                    return env.BRANCH_NAME ==~ /release\/.*/
+                }
             }
             steps {
                 sh '''
@@ -82,6 +113,25 @@ pipeline {
                         --file release-v0.0.1-${BUILD_ID}-linux.tgz
                 '''
             }
+        }
+    }
+    post {
+        always{
+            step([$class: 'WsCleanup'])   
+        }
+	success {
+            emailext attachLog: true, 
+                body: 'Pipeline job ${JOB_NAME} success. Build URL: ${BUILD_URL}', 
+                recipientProviders: [[$class: 'CulpritsRecipientProvider']], 
+                subject: 'SUCCESS: Jenkins Job- ${JOB_NAME} Build No- ${BUILD_NUMBER}', 
+                to: 'pebuildrelease@vce.com'            
+        }
+        failure {
+            emailext attachLog: true, 
+                body: 'Pipeline job ${JOB_NAME} failed. Build URL: ${BUILD_URL}', 
+                recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'], [$class: 'FailingTestSuspectsRecipientProvider'], [$class: 'UpstreamComitterRecipientProvider']], 
+                subject: 'FAILED: Jenkins Job- ${JOB_NAME} Build No- ${BUILD_NUMBER}', 
+                to: 'pebuildrelease@vce.com'
         }
     }
 }
