@@ -3,6 +3,7 @@ pipeline {
         docker {
             image 'rackhd/golang:1.8.0'
             label 'maven-builder'
+	    customWorkspace "workspace/${env.JOB_NAME}"
         }
     }
     environment {
@@ -96,6 +97,11 @@ pipeline {
                         --file release-v0.0.1-${BUILD_ID}-linux.tgz
                 '''
             }
+        }
+    }
+    post {
+        always{
+            step([$class: 'WsCleanup'])   
         }
     }
 }
