@@ -37,11 +37,13 @@ pipeline {
                               submoduleCfg: [], 
                               userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]]) 
 		    checkout([$class: 'GitSCM', 
-                              branches: [[name: '*/master']], 
-                              doGenerateSubmoduleConfigurations: false, 
-                              extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'workflow-cli']], 
-                              submoduleCfg: [], 
-                              userRemoteConfigs: [[url: 'https://github.com/dellemc-symphony/workflow-cli.git']]]) 
+			      branches: [[name: '*/master']], 
+			      doGenerateSubmoduleConfigurations: false, 
+			      extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'workflow-cli']], 
+			      gitTool: 'linux-git', 
+			      submoduleCfg: [], 
+			      userRemoteConfigs: [[credentialsId: 'github-03', url: 'https://github.com/dellemc-symphony/workflow-cli.git']]])
+
 		    sh "mkdir -p nexB/nexb-output/"
        		    sh "nexB/scancode --help"
                     sh "nexB/scancode --format html ${WORKSPACE}/workflow-cli nexB/nexb-output/workflow-cli.html"
