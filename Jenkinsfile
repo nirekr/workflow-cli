@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'rackhd/golang:1.8.0'
-           // label 'maven-builder'
+            label 'maven-builder'
 	    customWorkspace "workspace/${env.JOB_NAME}"
         }
     }
