@@ -8,9 +8,6 @@ The workflow CLI is written in Golang. It supports native execution on a variety
 
 The documentation is hosted at http://dellemc-symphony.readthedocs.io/.
 
-## Before you begin
-## Building
-## Packaging
 ## Deploying
 
 If you want to deploy the released version of the workflow CLI, you can simply download it from the following location: https://github.com/dellemc-symphony/workflow-cli/releases
