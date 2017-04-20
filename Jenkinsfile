@@ -37,14 +37,13 @@ pipeline {
                               extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'nexB']], 
                               submoduleCfg: [], 
                               userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]])
-                }
-				
-	            sh "mkdir -p /opt/nexB/nexb-output/"
-       		    sh "/opt/nexB/scancode --help"
-                    sh "/opt/nexB/scancode --format html ${WORKSPACE} /opt/nexB/nexb-output/workflow-cli.html"
-		    sh "/opt/nexB/scancode --format html-app ${WORKSPACE} /opt/nexB/nexb-output/workflow-cli-grap.html"
-	            sh "mv /root/opt/nexB/nexb-output/ ${WORKSPACE}/"
+		    sh "mkdir -p nexB/nexb-output/"
+       		    sh "nexB/scancode --help"
+                    sh "nexB/scancode --format html ${WORKSPACE} /opt/nexB/nexb-output/workflow-cli.html"
+		    sh "nexB/scancode --format html-app ${WORKSPACE} /opt/nexB/nexb-output/workflow-cli-grap.html"
+	            sh "mv nexB/nexb-output/ ${WORKSPACE}/"
 	       	    archiveArtifacts '**/nexb-output/**' 
+                }
             }
         }
         stage('Third Party Audit') {
