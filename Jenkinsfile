@@ -30,24 +30,18 @@ pipeline {
         }
         stage('NexB Scan') {
             steps {
-              	dir('/opt') {
                     checkout([$class: 'GitSCM', 
                               branches: [[name: '*/master']], 
                               doGenerateSubmoduleConfigurations: false, 
                               extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'nexB']], 
                               submoduleCfg: [], 
-                              userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]])
-		}
-		dir('/opt') {   
+                              userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]]) 
 		    sh "mkdir -p nexB/nexb-output/"
-		}
-		dir('/opt') {
        		    sh "nexB/scancode --help"
-                    sh "nexB/scancode --format html ${WORKSPACE} /opt/nexB/nexb-output/workflow-cli.html"
-		    sh "nexB/scancode --format html-app ${WORKSPACE} /opt/nexB/nexb-output/workflow-cli-grap.html"
+                    sh "nexB/scancode --format html ${WORKSPACE}/src nexB/nexb-output/workflow-cli.html"
+		    sh "nexB/scancode --format html-app ${WORKSPACE}/src nexB/nexb-output/workflow-cli-grap.html"
 	            sh "mv nexB/nexb-output/ ${WORKSPACE}/"
 	       	    archiveArtifacts '**/nexb-output/**' 
-                }
             }
         }
         stage('Third Party Audit') {
