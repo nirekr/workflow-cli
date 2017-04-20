@@ -40,10 +40,10 @@ pipeline {
                 }
 				
 	            sh "mkdir -p /opt/nexB/nexb-output/"
-       		    sh "/opt/nexB/scancode --help"
-                sh "/opt/nexB/scancode --format html ${WORKSPACE} /opt/nexB/nexb-output/workflow-cli.html"
-		    	sh "/opt/nexB/scancode --format html-app ${WORKSPACE} /opt/nexB/nexb-output/workflow-cli-grap.html"
-	            sh "mv /opt/nexB/nexb-output/ ${WORKSPACE}/"
+       		    sh "/root/opt/nexB/scancode --help"
+                sh "/root/opt/nexB/scancode --format html ${WORKSPACE} /root/opt/nexB/nexb-output/workflow-cli.html"
+		    	sh "/root/opt/nexB/scancode --format html-app ${WORKSPACE} /root/opt/nexB/nexb-output/workflow-cli-grap.html"
+	            sh "mv /root/opt/nexB/nexb-output/ ${WORKSPACE}/"
 	       	    archiveArtifacts '**/nexb-output/**' 
             }
         }
