@@ -33,14 +33,20 @@ pipeline {
                     checkout([$class: 'GitSCM', 
                               branches: [[name: '*/master']], 
                               doGenerateSubmoduleConfigurations: false, 
-                              extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: '../nexB']], 
+                              extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'nexB']], 
                               submoduleCfg: [], 
                               userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]]) 
-		    sh "mkdir -p ../nexB/nexb-output/"
-       		    sh "../nexB/scancode --help"
-                    sh "../nexB/scancode --format html ${WORKSPACE} ../nexB/nexb-output/workflow-cli.html"
-		    sh "nexB/scancode --format html-app ${WORKSPACE} ../nexB/nexb-output/workflow-cli-grap.html"
-	            sh "mv ../nexB/nexb-output/ ${WORKSPACE}/"
+		    checkout([$class: 'GitSCM', 
+                              branches: [[name: '*/master']], 
+                              doGenerateSubmoduleConfigurations: false, 
+                              extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'workflow-cli']], 
+                              submoduleCfg: [], 
+                              userRemoteConfigs: [[url: 'https://github.com/dellemc-symphony/workflow-cli.git']]]) 
+		    sh "mkdir -p nexB/nexb-output/"
+       		    sh "nexB/scancode --help"
+                    sh "nexB/scancode --format html ${WORKSPACE}/workflow-cli nexB/nexb-output/workflow-cli.html"
+		    sh "nexB/scancode --format html-app ${WORKSPACE}/workflow-cli nexB/nexb-output/workflow-cli-grap.html"
+//	            sh "mv nexB/nexb-output/ ${WORKSPACE}/"
 	       	    archiveArtifacts '**/nexb-output/**' 
             }
         }
