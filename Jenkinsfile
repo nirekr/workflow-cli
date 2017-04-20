@@ -37,7 +37,11 @@ pipeline {
                               extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'nexB']], 
                               submoduleCfg: [], 
                               userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]])
+		}
+		dir('/opt') {   
 		    sh "mkdir -p nexB/nexb-output/"
+		}
+		dir('/opt') {
        		    sh "nexB/scancode --help"
                     sh "nexB/scancode --format html ${WORKSPACE} /opt/nexB/nexb-output/workflow-cli.html"
 		    sh "nexB/scancode --format html-app ${WORKSPACE} /opt/nexB/nexb-output/workflow-cli-grap.html"
