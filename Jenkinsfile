@@ -30,18 +30,21 @@ pipeline {
         }
         stage('NexB Scan') {
             steps {
+              	dir('/opt') {
                     checkout([$class: 'GitSCM', 
                               branches: [[name: '*/master']], 
                               doGenerateSubmoduleConfigurations: false, 
                               extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'nexB']], 
                               submoduleCfg: [], 
                               userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]])
-		    sh "mkdir -p nexB/nexb-output/"       
-		    sh "nexB/scancode --help"
-                    sh "nexB/scancode --format html /go/src/github.com/dellemc-symphony/workflow-cli /root/nexB/nexb-output/workflow-cli.html"
-		    sh "nexB/scancode --format html-app /go/src/github.com/dellemc-symphony/workflow-cli /root/nexB/nexb-output/workflow-cli-grap.html"	       
-//	            sh "mv /go/nexB/nexb-output/ ${WORKSPACE}/"
-	       	    archiveArtifacts '**/nexb-output/**'
+                }
+				
+	            sh "mkdir -p /opt/nexB/nexb-output/"
+       		    sh "/opt/nexB/scancode --help"
+                sh "/opt/nexB/scancode --format html ${WORKSPACE} /opt/nexB/nexb-output/workflow-cli.html"
+		    	sh "/opt/nexB/scancode --format html-app ${WORKSPACE} /opt/nexB/nexb-output/workflow-cli-grap.html"
+	            sh "mv /opt/nexB/nexb-output/ ${WORKSPACE}/"
+	       	    archiveArtifacts '**/nexb-output/**' 
             }
         }
         stage('Third Party Audit') {
