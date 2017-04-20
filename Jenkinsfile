@@ -28,6 +28,22 @@ pipeline {
                 '''
             }
         }
+	    stage('Unit Tests') {
+            steps {
+                sh '''
+                    cd /go/src/github.com/dellemc-symphony/workflow-cli/
+                    make unit-test
+                '''
+            }
+        }
+        stage('Integration Tests') {
+            steps {
+                sh '''
+                    cd /go/src/github.com/dellemc-symphony/workflow-cli/
+                    make integration-test
+                '''
+            }
+        }
         stage('NexB Scan') {
             steps {
                     checkout([$class: 'GitSCM', 
@@ -52,19 +68,11 @@ pipeline {
 	       	    archiveArtifacts '**/nexb-output/**' 
             }
         }
-        stage('Third Party Audit') {
-            steps {
-                sh '''
-                    mvn org.apache.maven.plugins:maven-dependency-plugin:2.10:analyze-report license:add-third-party org.apache.maven.plugins:maven-dependency-plugin:2.10:tree \
-                    -DoutputType=dot \
-                    -DoutputFile=${WORKSPACE}/report/dependency-tree.dot
-                    '''   
-                archiveArtifacts '**/dependency-analysis.html, **/THIRD-PARTY.txt, **/dependency-check-report.html, **/dependency-tree.dot'
-            }
-        }
         stage('Release') {
             when {
-                environment name: "JOB_NAME", value: "workflow-cli-master"
+                expression {
+                    return env.BRANCH_NAME ==~ /release\/.*/
+                }
             }
             steps {
                 sh '''
@@ -110,6 +118,20 @@ pipeline {
     post {
         always{
             step([$class: 'WsCleanup'])   
+        }
+	success {
+            emailext attachLog: true, 
+                body: 'Pipeline job ${JOB_NAME} success. Build URL: ${BUILD_URL}', 
+                recipientProviders: [[$class: 'CulpritsRecipientProvider']], 
+                subject: 'SUCCESS: Jenkins Job- ${JOB_NAME} Build No- ${BUILD_NUMBER}', 
+                to: 'pebuildrelease@vce.com'            
+        }
+        failure {
+            emailext attachLog: true, 
+                body: 'Pipeline job ${JOB_NAME} failed. Build URL: ${BUILD_URL}', 
+                recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'], [$class: 'FailingTestSuspectsRecipientProvider'], [$class: 'UpstreamComitterRecipientProvider']], 
+                subject: 'FAILED: Jenkins Job- ${JOB_NAME} Build No- ${BUILD_NUMBER}', 
+                to: 'pebuildrelease@vce.com'
         }
     }
 }
