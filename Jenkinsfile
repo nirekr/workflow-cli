@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'rackhd/golang:1.8.0'
-            label 'maven-builder'
+           // label 'maven-builder'
 	    customWorkspace "workspace/${env.JOB_NAME}"
         }
     }
@@ -40,9 +40,9 @@ pipeline {
                 }
 				
 	            sh "mkdir -p /opt/nexB/nexb-output/"
-       		    sh "/root/opt/nexB/scancode --help"
-                    sh "/root/opt/nexB/scancode --format html ${WORKSPACE} /root/opt/nexB/nexb-output/workflow-cli.html"
-		    sh "/root/opt/nexB/scancode --format html-app ${WORKSPACE} /root/opt/nexB/nexb-output/workflow-cli-grap.html"
+       		    sh "/opt/nexB/scancode --help"
+                    sh "/opt/nexB/scancode --format html ${WORKSPACE} /opt/nexB/nexb-output/workflow-cli.html"
+		    sh "/opt/nexB/scancode --format html-app ${WORKSPACE} /opt/nexB/nexb-output/workflow-cli-grap.html"
 	            sh "mv /root/opt/nexB/nexb-output/ ${WORKSPACE}/"
 	       	    archiveArtifacts '**/nexb-output/**' 
             }
