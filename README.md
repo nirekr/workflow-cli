@@ -24,6 +24,7 @@ To execute the workflow CLI:
 | Command | Description |
 | --- | --- |
 | `fru` | Executes a field replacement workflow. The **fru** command supports several child commands, including **data**, **resume**, and **start**. The **fru data** command displays the data gathered for the FRU workflow. The **fru resume** command restarts execution of a failed FRU workflow from the last successful step in the process. The **fru start** command begins a FRU workflow.|
+| `help` | Displays help about any command. |
 | `status` | Retrieves the current status of the system. |
 | `target` | Sets the target location (IP address and port) for the FRU PAQX service. |
 | `version` | Prints version information for the CLI tool. |
@@ -43,12 +44,9 @@ To execute the workflow CLI for FRU:
   - ScaleIO IP endpoint, user name, and password 
 
   The workflow CLI can read these values from the `endpoint.yaml` file, if you provide them. For any value not provided in the `endpoint.yaml` file, the workflow CLI displays a prompt to allow you to specify the value at runtime.  
-  
-  At the conclusion of processing, the workflow CLI returns a UUID that represents the workflow ID. You will need this value to complete the next step to display the data (`./workflow-cli fru data <workflow-id>`).  
 
-3. Display the data collected for the FRU workflow by running this command: `./workflow-cli fru data <workflow-id>`
+After collecting the data needed to execute the FRU workflow, the CLI will prompt you to select the degraded node to remove. Once this node has been removed, the CLI will prompt you to select the new node that will replace the degraded node.   
 
- The workflow CLI returns a JSON data structure that shows the collected data. 
  
 ## Contributing
 
@@ -58,7 +56,7 @@ Contribute code and make submissions at the relevant GitHub repository level. Se
 ## Community
 
 Reach out to us on Slack #symphony channel. Request an invite at http://community.codedellemc.com.
-You can also join [Google Groups] (https://groups.google.com/d/forum/dellemc-symphony) and start a discussion. 
+You can also join [Google Groups](https://groups.google.com/d/forum/dellemc-symphony) and start a discussion. 
 
 ## Copyright
 Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
