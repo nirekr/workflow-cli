@@ -8,6 +8,61 @@ The workflow CLI is written in Golang. It supports native execution on a variety
 
 The documentation is hosted at http://dellemc-symphony.readthedocs.io/.
 
+## Before you begin
+ 
+Make sure the following is installed:
+
+```
+Go Programming Language release 1.8 (go1.8) or higher 
+
+```
+
+## Building
+
+Dell EMC strongly encourages you to build this project on a Linux or Mac environment. The instructions that follow will work on either Linux or Mac.
+
+To install dependencies:
+```	
+make deps
+```
+	
+To build a binary for all operating systems:
+```
+make build
+```
+
+To build a Linux binary:
+```
+make build-linux
+```
+
+To build a Mac binary:
+```
+make build-mac
+```
+
+To build a Windows binary:
+```
+make build-windows
+```
+
+To run all tests:
+```
+make test
+```
+
+To run Integration Test:
+```	
+make integration-test
+```
+
+To run Unit Tests:
+```
+make unit-test
+```
+
+The default behaviour (running `make` with no commands or arguments) will run `deps`, `build`, and `test`.
+
 ## Deploying
 
 If you want to deploy the released version of the workflow CLI, you can simply download it from the following location: https://github.com/dellemc-symphony/workflow-cli/releases
@@ -47,17 +102,19 @@ To execute the workflow CLI for FRU:
 
 After collecting the data needed to execute the FRU workflow, the CLI will prompt you to select the degraded node to remove. Once this node has been removed, the CLI will prompt you to select the new node that will replace the degraded node.   
 
- 
+
 ## Contributing
-
-The Symphony project is a collection of services and libraries housed at https://github.com/dellemc-symphony.
-Contribute code and make submissions at the relevant GitHub repository level. See our documentation for details on how to contribute.
-
+Project Symphony is a collection of services and libraries housed at [GitHub][github].
+Contribute code and make submissions at the relevant GitHub repository level.
+See our documentation for details on how to [contribute][contributing].
 ## Community
+Reach out to us on the Slack [#symphony][slack] channel. Request an invite at [{code}Community][codecommunity].
+You can also join [Google Groups][googlegroups] and start a discussion.
+ 
+[slack]: https://codecommunity.slack.com/messages/symphony
+[googlegroups]: https://groups.google.com/forum/#!forum/dellemc-symphony
+[codecommunity]: http://community.codedellemc.com/
+[contributing]: http://dellemc-symphony.readthedocs.io/en/latest/contributingtosymphony.html
+[github]: https://github.com/dellemc-symphony
+[documentation]: https://dellemc-symphony.readthedocs.io/en/latest/
 
-Reach out to us on Slack #symphony channel. Request an invite at http://community.codedellemc.com.
-You can also join [Google Groups](https://groups.google.com/d/forum/dellemc-symphony) and start a discussion. 
-
-## Copyright
-Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
-Dell EMC Confidential/Proprietary Information
