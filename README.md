@@ -61,7 +61,7 @@ To run Unit Tests:
 make unit-test
 ```
 
-The default behaviour (running `make` with no commands or arguments) will run `deps`, `build`, and `test`.
+The default behavior (running `make` with no commands or arguments) will run `deps`, `build`, and `test`.
 
 ## Deploying
 
