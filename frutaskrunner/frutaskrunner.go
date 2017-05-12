@@ -15,6 +15,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/dellemc-symphony/workflow-cli/auth"
 	"github.com/dellemc-symphony/workflow-cli/models"
@@ -149,14 +150,35 @@ func RunTask(r models.Response, target string) error {
 			return nil
 		}
 
+		delay := 0
+		if r.Links[index].Delay != "" {
+			delay, err = strconv.Atoi(r.Links[index].Delay)
+			if err != nil {
+				log.Warnf("Error parsing response: %s", err)
+			}
+
+		}
+
 		switch r.Links[index].Rel {
 
 		case models.StepNext:
-			log.Infof("Step Complete: %s\n", r.CurrentStep)
+			log.Infof("Step Complete: %s", r.CurrentStep)
+
+			if delay != 0 {
+				log.Infof("Sleeping for %d seconds before continuing", delay)
+				time.Sleep(time.Duration(delay) * time.Second)
+			}
+			fmt.Print("\n")
 
 		case models.StepRetry:
 			log.Warnf("Step Failed: %s", r.CurrentStep)
-			log.Warnf("Attempting retry: %s\n", r.CurrentStep)
+
+			if delay != 0 {
+				log.Infof("Sleeping for %d seconds before retrying", delay)
+				time.Sleep(time.Duration(delay) * time.Second)
+			} else {
+				log.Warnf("Attempting retry: %s\n", r.CurrentStep)
+			}
 
 		default:
 			log.Warnf("Status Unknown: %+v\n", r)
@@ -222,8 +244,9 @@ func InitiateWorkflow(target string) (models.Response, error) {
 
 //PresentNodesToUser presents the user with a list of nodes and asks them to choose one
 func PresentNodesToUser(action string, nodes models.Nodes) (models.Node, error) {
-	var selector int
 	var err error
+	var selector int
+	var selectedNode models.Node
 	ok := false
 
 	for !ok {
@@ -242,23 +265,30 @@ func PresentNodesToUser(action string, nodes models.Nodes) (models.Node, error) 
 		}
 		table.Render()
 
-		// Ask which task to resume, by task-id
 		scanner := bufio.NewScanner(os.Stdin)
-		fmt.Printf("Select a node for action '%s': ", action)
+		selector = 0
+		for selector < 1 || selector > len(nodes) {
 
-		scanner.Scan()
-		input := scanner.Text()
-		if err = scanner.Err(); err != nil {
-			return models.Node{}, fmt.Errorf("Error reading user input: %s", err)
+			// Ask which task to resume, by task-id
+			fmt.Printf("Select a node for action '%s': ", action)
+
+			scanner.Scan()
+			input := scanner.Text()
+			if err = scanner.Err(); err != nil {
+				return models.Node{}, fmt.Errorf("Error reading user input: %s", err)
+			}
+
+			selector, err = strconv.Atoi(input)
+			if err != nil {
+				return models.Node{}, fmt.Errorf("Error parsing user input: %s", err)
+			}
+
+			if selector < 1 || selector > len(nodes) {
+				log.Warnf("Invalid node selection: %d", selector)
+			}
 		}
-
-		selector, err = strconv.Atoi(input)
-		if err != nil {
-			return models.Node{}, fmt.Errorf("Error parsing user input: %s", err)
-		}
-
 		// subtract 1 because nodes is an array and we counted from 1 in the table
-		selectedNode := nodes[selector-1]
+		selectedNode = nodes[selector-1]
 
 		fmt.Printf("Node selected: \n")
 		selectedTable := tablewriter.NewWriter(os.Stdout)
@@ -274,7 +304,7 @@ func PresentNodesToUser(action string, nodes models.Nodes) (models.Node, error) 
 		fmt.Printf("\nIs this the correct node? [Y/N] or Q to quit: ")
 		scanner.Scan()
 
-		input = scanner.Text()
+		input := scanner.Text()
 		if err := scanner.Err(); err != nil {
 			return models.Node{}, fmt.Errorf("Error reading user input: %s", err)
 		}
@@ -288,5 +318,5 @@ func PresentNodesToUser(action string, nodes models.Nodes) (models.Node, error) 
 
 	}
 
-	return nodes[selector], nil
+	return selectedNode, nil
 }

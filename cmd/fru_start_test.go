@@ -75,6 +75,8 @@ var _ = Describe("FruStart", func() {
 			err := resources.WriteEndpointsFile("AllFields", endpointLocation)
 			Expect(err).To(BeNil())
 
+			startTime := time.Now()
+
 			cmd := exec.Command(binLocation, "fru", "start")
 
 			stdin, err := cmd.StdinPipe()
@@ -113,6 +115,8 @@ var _ = Describe("FruStart", func() {
 			Expect(outBuf.String()).To(ContainSubstring(nodeSelection))
 			Expect(errBuf.String()).To(ContainSubstring("Workflow complete"))
 
+			elapsedTime := time.Since(startTime)
+			Expect(elapsedTime.Seconds()).To(BeNumerically(">", 5))
 		})
 	})
 

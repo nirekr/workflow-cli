@@ -473,6 +473,7 @@ func CreateMock(https bool) {
 			Href:   url,
 			Type:   "application/json",
 			Method: "POST",
+			Delay:  "5",
 		}
 
 		links := models.Links{stepNext}
