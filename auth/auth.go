@@ -70,6 +70,7 @@ func TargetAuth(target string) (string, string, string, error) {
 			password = string(passwordBytes)
 
 		} else {
+			scanner.Scan()
 			password = scanner.Text()
 
 			if err := scanner.Err(); err != nil {
@@ -91,7 +92,8 @@ func ParseEndpointsFile() map[string]models.Endpoint {
 		log.Fatal(err)
 	}
 
-	endpoints := make(map[string]models.Endpoint, 4)
+	services := []string{"rackhd", "coprhd", "vcenter", "scaleio", "scaleio_mdm"}
+	endpoints := make(map[string]models.Endpoint, len(services))
 
 	viper.SetConfigName("endpoint")
 	viper.SetConfigType("yaml")
@@ -104,7 +106,6 @@ func ParseEndpointsFile() map[string]models.Endpoint {
 		return endpoints
 	}
 
-	services := []string{"rackhd", "coprhd", "vcenter", "scaleio"}
 	for _, service := range services {
 
 		entry := models.Endpoint{}

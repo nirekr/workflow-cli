@@ -268,7 +268,6 @@ func PresentNodesToUser(action string, nodes models.Nodes) (models.Node, error) 
 		scanner := bufio.NewScanner(os.Stdin)
 		selector = 0
 		for selector < 1 || selector > len(nodes) {
-
 			// Ask which task to resume, by task-id
 			fmt.Printf("Select a node for action '%s': ", action)
 
@@ -290,7 +289,6 @@ func PresentNodesToUser(action string, nodes models.Nodes) (models.Node, error) 
 		// subtract 1 because nodes is an array and we counted from 1 in the table
 		selectedNode = nodes[selector-1]
 
-		fmt.Printf("Node selected: \n")
 		selectedTable := tablewriter.NewWriter(os.Stdout)
 		selectedTable.SetHeader([]string{"Hostname", "Serial Number", "Mgmt IP", "Status"})
 		selectedTable.Append([]string{

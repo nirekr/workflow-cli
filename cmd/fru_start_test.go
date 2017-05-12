@@ -93,15 +93,19 @@ var _ = Describe("FruStart", func() {
 
 			cmd.Start()
 
+			// Select node 2 for removal
 			io.WriteString(stdin, "2\n")
 			time.Sleep(500 * time.Millisecond)
 
+			//Confirm selection
 			io.WriteString(stdin, "Y\n")
 			time.Sleep(500 * time.Millisecond)
 
+			// Select node 2 for add
 			io.WriteString(stdin, "2\n")
 			time.Sleep(500 * time.Millisecond)
 
+			//Confirm selection
 			io.WriteString(stdin, "Y\n")
 			time.Sleep(500 * time.Millisecond)
 
@@ -141,39 +145,59 @@ var _ = Describe("FruStart", func() {
 
 			cmd.Start()
 
-			io.WriteString(stdin, "1\n")
+			//Username for RackHD
+			io.WriteString(stdin, "RackHDUsername\n")
 			time.Sleep(500 * time.Millisecond)
 
-			io.WriteString(stdin, "1\n")
+			//Password for RackHD
+			io.WriteString(stdin, "RackHDPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
-			io.WriteString(stdin, "1\n")
+			//Username for CoprHD
+			io.WriteString(stdin, "CoprHDusername\n")
 			time.Sleep(500 * time.Millisecond)
 
+			//Password for CoprHD
+			io.WriteString(stdin, "CoprHDpassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Username for vCenter
+			io.WriteString(stdin, "vCenterUsername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for vCenter
+			io.WriteString(stdin, "vCenterPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Username for ScaleIO
+			io.WriteString(stdin, "ScaleIOUsername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for ScaleIO
+			io.WriteString(stdin, "ScaleIOPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Select node 2 for removal
 			io.WriteString(stdin, "2\n")
 			time.Sleep(500 * time.Millisecond)
 
-			io.WriteString(stdin, "1\n")
-			time.Sleep(500 * time.Millisecond)
-
-			io.WriteString(stdin, "1\n")
-			time.Sleep(500 * time.Millisecond)
-
-			io.WriteString(stdin, "1\n")
-			time.Sleep(500 * time.Millisecond)
-
-			io.WriteString(stdin, "1\n")
-			time.Sleep(500 * time.Millisecond)
-
-			io.WriteString(stdin, "2\n")
-			time.Sleep(500 * time.Millisecond)
-
+			// Confirm selection
 			io.WriteString(stdin, "Y\n")
 			time.Sleep(500 * time.Millisecond)
 
+			//Username for ScaleIO MDM
+			io.WriteString(stdin, "ScaleIOMDMUsername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for ScaleIO MDM
+			io.WriteString(stdin, "ScaleIOMDMPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Select node 2 for addition
 			io.WriteString(stdin, "2\n")
 			time.Sleep(500 * time.Millisecond)
 
+			//Confirm selection
 			io.WriteString(stdin, "Y\n")
 			time.Sleep(500 * time.Millisecond)
 
@@ -209,51 +233,79 @@ var _ = Describe("FruStart", func() {
 
 			cmd.Start()
 
-			io.WriteString(stdin, "1\n")
+			//Endpoint for RackHD
+			io.WriteString(stdin, "RackHDEndpoint\n")
 			time.Sleep(500 * time.Millisecond)
 
-			io.WriteString(stdin, "1\n")
+			//Username for RackHD
+			io.WriteString(stdin, "RackHDUsername\n")
 			time.Sleep(500 * time.Millisecond)
 
-			io.WriteString(stdin, "1\n")
+			//Password for RackHD
+			io.WriteString(stdin, "RackHDPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
-			io.WriteString(stdin, "1\n")
+			//Endpoint for CoprHD
+			io.WriteString(stdin, "CoprHDEndpoint\n")
 			time.Sleep(500 * time.Millisecond)
 
+			//Username for CoprHD
+			io.WriteString(stdin, "CoprHDusername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for CoprHD
+			io.WriteString(stdin, "CoprHDpassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Endpoint for vCenter
+			io.WriteString(stdin, "vCenterEndpoint\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Username for vCenter
+			io.WriteString(stdin, "vCenterUsername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for vCenter
+			io.WriteString(stdin, "vCenterPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Endpoint for ScaleIO
+			io.WriteString(stdin, "ScaleIOEndpoint\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Username for ScaleIO
+			io.WriteString(stdin, "ScaleIOUsername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for ScaleIO
+			io.WriteString(stdin, "ScaleIOPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Select node 2 for removal
 			io.WriteString(stdin, "2\n")
 			time.Sleep(500 * time.Millisecond)
 
-			io.WriteString(stdin, "3\n")
-			time.Sleep(500 * time.Millisecond)
-
-			io.WriteString(stdin, "1\n")
-			time.Sleep(500 * time.Millisecond)
-
-			io.WriteString(stdin, "2\n")
-			time.Sleep(500 * time.Millisecond)
-
-			io.WriteString(stdin, "3\n")
-			time.Sleep(500 * time.Millisecond)
-
-			io.WriteString(stdin, "1\n")
-			time.Sleep(500 * time.Millisecond)
-
-			io.WriteString(stdin, "2\n")
-			time.Sleep(500 * time.Millisecond)
-
-			io.WriteString(stdin, "3\n")
-			time.Sleep(500 * time.Millisecond)
-
-			io.WriteString(stdin, "2\n")
-			time.Sleep(500 * time.Millisecond)
-
+			// Confirm selection
 			io.WriteString(stdin, "Y\n")
 			time.Sleep(500 * time.Millisecond)
 
+			//Endpoint for ScaleIO MDM
+			io.WriteString(stdin, "ScaleIOMDMEndpoint\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Username for ScaleIO MDM
+			io.WriteString(stdin, "ScaleIOMDMUsername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for ScaleIO MDM
+			io.WriteString(stdin, "ScaleIOMDMPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Select node 2 for addition
 			io.WriteString(stdin, "2\n")
 			time.Sleep(500 * time.Millisecond)
 
+			//Confirm selection
 			io.WriteString(stdin, "Y\n")
 			time.Sleep(500 * time.Millisecond)
 

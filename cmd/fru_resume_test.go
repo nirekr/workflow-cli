@@ -86,18 +86,23 @@ var _ = Describe("FruResume", func() {
 
 			cmd.Start()
 
+			// Select workflow 1 to resume
 			io.WriteString(stdin, "1\n")
 			time.Sleep(500 * time.Millisecond)
 
+			// Select node 2 to remove
 			io.WriteString(stdin, "2\n")
 			time.Sleep(500 * time.Millisecond)
 
+			// Confirm selection
 			io.WriteString(stdin, "Y\n")
 			time.Sleep(500 * time.Millisecond)
 
+			// Select node 2 to add
 			io.WriteString(stdin, "2\n")
 			time.Sleep(500 * time.Millisecond)
 
+			// Confirm selection
 			io.WriteString(stdin, "Y\n")
 			time.Sleep(500 * time.Millisecond)
 
