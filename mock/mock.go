@@ -29,6 +29,7 @@ func CreateMock(https bool) {
 	router := gin.Default()
 	id := "123abc-456def-789ghi"
 	retry := true
+	longRunningCount := 0
 
 	// About corresponds to the "status" command
 	router.GET("/fru/api/about", func(c *gin.Context) {
@@ -108,8 +109,8 @@ func CreateMock(https bool) {
 	steps["start-vcenter-data-collection"] = "present-system-list-remove"
 	steps["present-system-list-remove"] = "capture-scaleio-mdm-credentials"
 	steps["capture-scaleio-mdm-credentials"] = "start-scaleio-remove-workflow"
-	steps["start-scaleio-remove-workflow"] = "wait-for-scaleio-workflow"
-	steps["wait-for-scaleio-workflow"] = "power-off-scaleio-vm"
+	steps["start-scaleio-remove-workflow"] = "longrunning/scaleio-remove-workflow"
+	steps["longrunning/scaleio-remove-workflow"] = "power-off-scaleio-vm"
 	steps["power-off-scaleio-vm"] = "enter-maintanence-mode"
 	steps["enter-maintanence-mode"] = "reboot-host-for-discovery"
 	steps["reboot-host-for-discovery"] = "wait-for-rackhd-discovery"
@@ -492,9 +493,24 @@ func CreateMock(https bool) {
 		c.JSON(http.StatusCreated, response)
 	})
 
-	router.POST("/fru/api/workflow/:trackingid/wait-for-scaleio-workflow", func(c *gin.Context) {
+	router.POST("/fru/api/workflow/:trackingid/longrunning/scaleio-remove-workflow", func(c *gin.Context) {
 		id = c.Param("trackingid")
-		nextStep := steps["wait-for-scaleio-workflow"]
+
+		var nextStep string
+		var delay string
+
+		// For this step, do 3 "wait" cycles. Overwrite "nextStep" and "delay"
+		if longRunningCount < 3 {
+			longRunningCount++
+			nextStep = "longrunning/scaleio-remove-workflow"
+			delay = "5"
+
+		} else {
+			nextStep = steps["longrunning/scaleio-remove-workflow"]
+			delay = ""
+			longRunningCount = 0
+		}
+
 		var url string
 		if https {
 			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
@@ -507,7 +523,7 @@ func CreateMock(https bool) {
 			Href:   url,
 			Type:   "application/json",
 			Method: "POST",
-			Delay:  "5",
+			Delay:  delay,
 		}
 
 		links := models.Links{stepNext}
