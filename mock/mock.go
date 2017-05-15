@@ -73,9 +73,9 @@ func CreateMock(https bool) {
 	router.GET("/fru/api/workflow/:trackingid", func(c *gin.Context) {
 		var url string
 		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/vcenter-endpoint", "https://", id)
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/capture-vcenter-endpoint", "https://", id)
 		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/vcenter-endpoint", "http://", id)
+			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/capture-vcenter-endpoint", "http://", id)
 		}
 
 		stepNext := models.Link{
@@ -90,7 +90,7 @@ func CreateMock(https bool) {
 		response := models.Response{
 			ID:          id,
 			Workflow:    "quanta-replacement-d51b-esxi",
-			CurrentStep: "vcenter-endpoint",
+			CurrentStep: "capture-vcenter-endpoint",
 			Links:       links,
 		}
 
@@ -99,14 +99,15 @@ func CreateMock(https bool) {
 	})
 
 	steps := make(map[string]string)
-	steps[""] = "rackhd-endpoint"
-	steps["rackhd-endpoint"] = "coprhd-endpoint"
-	steps["coprhd-endpoint"] = "vcenter-endpoint"
-	steps["vcenter-endpoint"] = "scaleio-endpoint"
-	steps["scaleio-endpoint"] = "start-scaleio-data-collection"
+	steps[""] = "capture-rackhd-endpoint"
+	steps["capture-rackhd-endpoint"] = "capture-coprhd-endpoint"
+	steps["capture-coprhd-endpoint"] = "capture-vcenter-endpoint"
+	steps["capture-vcenter-endpoint"] = "capture-scaleio-endpoint"
+	steps["capture-scaleio-endpoint"] = "start-scaleio-data-collection"
 	steps["start-scaleio-data-collection"] = "start-vcenter-data-collection"
-	steps["start-vcenter-data-collection"] = "remove-node-selection"
-	steps["remove-node-selection"] = "start-scaleio-remove-workflow"
+	steps["start-vcenter-data-collection"] = "present-system-list-remove"
+	steps["present-system-list-remove"] = "capture-scaleio-mdm-credentials"
+	steps["capture-scaleio-mdm-credentials"] = "start-scaleio-remove-workflow"
 	steps["start-scaleio-remove-workflow"] = "wait-for-scaleio-workflow"
 	steps["wait-for-scaleio-workflow"] = "power-off-scaleio-vm"
 	steps["power-off-scaleio-vm"] = "enter-maintanence-mode"
@@ -114,8 +115,8 @@ func CreateMock(https bool) {
 	steps["reboot-host-for-discovery"] = "wait-for-rackhd-discovery"
 	steps["wait-for-rackhd-discovery"] = "instruct-physical-removal"
 	steps["instruct-physical-removal"] = "wait-for-rackhd-discovery2"
-	steps["wait-for-rackhd-discovery2"] = "add-node-selection"
-	steps["add-node-selection"] = "configure-disks-rackhd"
+	steps["wait-for-rackhd-discovery2"] = "present-system-list-add"
+	steps["present-system-list-add"] = "configure-disks-rackhd"
 	steps["configure-disks-rackhd"] = "install-esxi"
 	steps["install-esxi"] = "add-host-to-vcenter"
 	steps["add-host-to-vcenter"] = "install-scaleio-vib"
@@ -156,9 +157,9 @@ func CreateMock(https bool) {
 		c.JSON(http.StatusCreated, response)
 	})
 
-	router.POST("/fru/api/workflow/:trackingid/rackhd-endpoint", func(c *gin.Context) {
+	router.POST("/fru/api/workflow/:trackingid/capture-rackhd-endpoint", func(c *gin.Context) {
 		id = c.Param("trackingid")
-		nextStep := steps["rackhd-endpoint"]
+		nextStep := steps["capture-rackhd-endpoint"]
 		// Validate JSON Body
 		var rackhdCreds models.Endpoint
 		if c.BindJSON(&rackhdCreds) == nil {
@@ -181,7 +182,7 @@ func CreateMock(https bool) {
 			response := models.Response{
 				ID:          id,
 				Workflow:    "quanta-replacement-d51b-esxi",
-				CurrentStep: "rackhd-endpoint",
+				CurrentStep: "capture-rackhd-endpoint",
 				Links:       links,
 			}
 
@@ -189,9 +190,9 @@ func CreateMock(https bool) {
 		}
 	})
 
-	router.POST("/fru/api/workflow/:trackingid/coprhd-endpoint", func(c *gin.Context) {
+	router.POST("/fru/api/workflow/:trackingid/capture-coprhd-endpoint", func(c *gin.Context) {
 		id = c.Param("trackingid")
-		nextStep := steps["coprhd-endpoint"]
+		nextStep := steps["capture-coprhd-endpoint"]
 		// Validate JSON Body
 		var coprhdCreds models.Endpoint
 		if c.BindJSON(&coprhdCreds) == nil {
@@ -214,7 +215,7 @@ func CreateMock(https bool) {
 			response := models.Response{
 				ID:          id,
 				Workflow:    "quanta-replacement-d51b-esxi",
-				CurrentStep: "coprhd-endpoint",
+				CurrentStep: "capture-coprhd-endpoint",
 				Links:       links,
 			}
 
@@ -222,9 +223,9 @@ func CreateMock(https bool) {
 		}
 	})
 
-	router.POST("/fru/api/workflow/:trackingid/vcenter-endpoint", func(c *gin.Context) {
+	router.POST("/fru/api/workflow/:trackingid/capture-vcenter-endpoint", func(c *gin.Context) {
 		id = c.Param("trackingid")
-		nextStep := steps["vcenter-endpoint"]
+		nextStep := steps["capture-vcenter-endpoint"]
 		// Validate JSON Body
 		var vcenterCreds models.Endpoint
 		if c.BindJSON(&vcenterCreds) == nil {
@@ -247,7 +248,7 @@ func CreateMock(https bool) {
 			response := models.Response{
 				ID:          id,
 				Workflow:    "quanta-replacement-d51b-esxi",
-				CurrentStep: "vcenter-endpoint",
+				CurrentStep: "capture-vcenter-endpoint",
 				Links:       links,
 			}
 
@@ -255,9 +256,9 @@ func CreateMock(https bool) {
 		}
 	})
 
-	router.POST("/fru/api/workflow/:trackingid/scaleio-endpoint", func(c *gin.Context) {
+	router.POST("/fru/api/workflow/:trackingid/capture-scaleio-endpoint", func(c *gin.Context) {
 		id = c.Param("trackingid")
-		nextStep := steps["scaleio-endpoint"]
+		nextStep := steps["capture-scaleio-endpoint"]
 		// Validate JSON Body
 		var scaleioCreds models.Endpoint
 		if c.BindJSON(&scaleioCreds) == nil {
@@ -280,7 +281,7 @@ func CreateMock(https bool) {
 			response := models.Response{
 				ID:          id,
 				Workflow:    "quanta-replacement-d51b-esxi",
-				CurrentStep: "scaleio-endpoint",
+				CurrentStep: "capture-scaleio-endpoint",
 				Links:       links,
 			}
 
@@ -395,13 +396,46 @@ func CreateMock(https bool) {
 		c.JSON(http.StatusCreated, response)
 	})
 
-	router.POST("/fru/api/workflow/:trackingid/remove-node-selection", func(c *gin.Context) {
+	router.POST("/fru/api/workflow/:trackingid/present-system-list-remove", func(c *gin.Context) {
 		id = c.Param("trackingid")
-		nextStep := steps["remove-node-selection"]
+		nextStep := steps["present-system-list-remove"]
 
 		var nodeToRemove models.Node
 		if c.BindJSON(&nodeToRemove) == nil {
 
+			var url string
+			if https {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
+			} else {
+				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
+			}
+
+			stepNext := models.Link{
+				Rel:    "step-next",
+				Href:   url,
+				Type:   "application/vnd.dellemc.scaleio_mdm.endpoint+json",
+				Method: "POST",
+			}
+
+			links := models.Links{stepNext}
+
+			response := models.Response{
+				ID:          id,
+				Workflow:    "quanta-replacement-d51b-esxi",
+				CurrentStep: "present-system-list-remove",
+				Links:       links,
+			}
+
+			c.JSON(http.StatusCreated, response)
+		}
+	})
+
+	router.POST("/fru/api/workflow/:trackingid/capture-scaleio-mdm-credentials", func(c *gin.Context) {
+		id = c.Param("trackingid")
+		nextStep := steps["capture-scaleio-mdm-credentials"]
+		// Validate JSON Body
+		var scaleioCreds models.Endpoint
+		if c.BindJSON(&scaleioCreds) == nil {
 			var url string
 			if https {
 				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
@@ -421,7 +455,7 @@ func CreateMock(https bool) {
 			response := models.Response{
 				ID:          id,
 				Workflow:    "quanta-replacement-d51b-esxi",
-				CurrentStep: "remove-node-selection",
+				CurrentStep: "capture-scaleio-mdm-credentials",
 				Links:       links,
 			}
 
@@ -473,6 +507,7 @@ func CreateMock(https bool) {
 			Href:   url,
 			Type:   "application/json",
 			Method: "POST",
+			Delay:  "5",
 		}
 
 		links := models.Links{stepNext}
@@ -685,9 +720,9 @@ func CreateMock(https bool) {
 		c.JSON(http.StatusCreated, response)
 	})
 
-	router.POST("/fru/api/workflow/:trackingid/add-node-selection", func(c *gin.Context) {
+	router.POST("/fru/api/workflow/:trackingid/present-system-list-add", func(c *gin.Context) {
 		id = c.Param("trackingid")
-		nextStep := steps["add-node-selection"]
+		nextStep := steps["present-system-list-add"]
 
 		var nodeToRemove models.Node
 		if c.BindJSON(&nodeToRemove) == nil {
@@ -711,7 +746,7 @@ func CreateMock(https bool) {
 			response := models.Response{
 				ID:          id,
 				Workflow:    "quanta-replacement-d51b-esxi",
-				CurrentStep: "add-node-selection",
+				CurrentStep: "present-system-list-add",
 				Links:       links,
 			}
 

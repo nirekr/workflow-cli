@@ -77,6 +77,14 @@ ScaleIO:
   username:
     - "admin"
   password:
+    - "admin"
+
+ScaleIO_MDM:
+  endpoint:
+    - "https://10.10.10.10:9090"
+  username:
+    - "admin"
+  password:
     - "admin"`
 
 const missingEndpoints = `
@@ -110,6 +118,13 @@ ScaleIO:
   username:
     - "admin"
   password:
+    - "admin"
+ScaleIO_MDM:
+  endpoint:
+#    - "https://10.10.10.10:9090"
+  username:
+    - "admin"
+  password:
     - "admin"`
 
 const missingCredentials = `
@@ -138,6 +153,13 @@ vCenter:
   password:
 #    - "admin"
 ScaleIO:
+  endpoint:
+    - "https://10.10.10.10:9090"
+  username:
+#    - "admin"
+  password:
+#    - "admin"
+ScaleIO_MDM:
   endpoint:
     - "https://10.10.10.10:9090"
   username:

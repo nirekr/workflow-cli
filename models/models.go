@@ -40,6 +40,7 @@ type Link struct {
 	Href   string `json:"href,omitempty"`
 	Type   string `json:"type,omitempty"`
 	Method string `json:"method,omitempty"`
+	Delay  string `json:"next-step-delay,omitempty"`
 }
 
 // Node is a struct ...

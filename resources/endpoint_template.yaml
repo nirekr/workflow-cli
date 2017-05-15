@@ -45,3 +45,11 @@ ScaleIO:
 #    - "admin"
   password:
 #    - "admin"
+
+ScaleIO_MDM:
+  endpoint:
+#    - "https://10.10.10.10:9090"
+  username:
+#    - "admin"
+  password:
+#    - "admin"
