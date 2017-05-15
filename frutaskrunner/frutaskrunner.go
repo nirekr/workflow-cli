@@ -162,11 +162,12 @@ func RunTask(r models.Response, target string) error {
 		switch r.Links[index].Rel {
 
 		case models.StepNext:
-			log.Infof("Step Complete: %s", r.CurrentStep)
 
 			if delay != 0 {
-				log.Infof("Sleeping for %d seconds before continuing", delay)
+				log.Infof("This task is in progress. Please wait...")
 				time.Sleep(time.Duration(delay) * time.Second)
+			} else {
+				log.Infof("Step Complete: %s", r.CurrentStep)
 			}
 			fmt.Print("\n")
 
@@ -174,7 +175,7 @@ func RunTask(r models.Response, target string) error {
 			log.Warnf("Step Failed: %s", r.CurrentStep)
 
 			if delay != 0 {
-				log.Infof("Sleeping for %d seconds before retrying", delay)
+				log.Infof("Waiting for %d seconds before retrying", delay)
 				time.Sleep(time.Duration(delay) * time.Second)
 			} else {
 				log.Warnf("Attempting retry: %s\n", r.CurrentStep)
@@ -297,12 +298,14 @@ func PresentNodesToUser(action string, nodes models.Nodes) (models.Node, error) 
 			selectedNode.ManagementIP,
 			selectedNode.Status,
 		})
+		fmt.Printf("\n")
 		selectedTable.Render()
 
-		fmt.Printf("\nIs this the correct node? [Y/N] or Q to quit: ")
+		fmt.Printf("Is this the correct node? [Y/N] or Q to quit: ")
 		scanner.Scan()
 
 		input := scanner.Text()
+		fmt.Printf("\n")
 		if err := scanner.Err(); err != nil {
 			return models.Node{}, fmt.Errorf("Error reading user input: %s", err)
 		}
