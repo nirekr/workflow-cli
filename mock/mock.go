@@ -496,13 +496,19 @@ func CreateMock(https bool) {
 	router.POST("/fru/api/workflow/:trackingid/longrunning/scaleio-remove-workflow", func(c *gin.Context) {
 		id = c.Param("trackingid")
 
-		nextStep := steps["longrunning/scaleio-remove-workflow"]
-		delay := ""
+		var nextStep string
+		var delay string
+
 		// For this step, do 3 "wait" cycles. Overwrite "nextStep" and "delay"
 		if longRunningCount < 3 {
 			longRunningCount++
 			nextStep = "longrunning/scaleio-remove-workflow"
 			delay = "5"
+
+		} else {
+			nextStep = steps["longrunning/scaleio-remove-workflow"]
+			delay = ""
+			longRunningCount = 0
 		}
 
 		var url string
