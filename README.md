@@ -10,12 +10,9 @@ The documentation is hosted at http://dellemc-symphony.readthedocs.io/.
 
 ## Before you begin
  
-Make sure the following is installed:
+Verify that the following tool is installed:
 
-```
-Go Programming Language release 1.8 (go1.8) or higher 
-
-```
+* Go Programming Language release 1.8 (go1.8) or higher  
 
 ## Building
 
@@ -104,17 +101,20 @@ After collecting the data needed to execute the FRU workflow, the CLI will promp
 
 
 ## Contributing
+
 Project Symphony is a collection of services and libraries housed at [GitHub][github].
-Contribute code and make submissions at the relevant GitHub repository level.
-See our documentation for details on how to [contribute][contributing].
+
+Contribute code and make submissions at the relevant GitHub repository level. See [our documentation][contributing] for details on how to contribute.
+
 ## Community
+
 Reach out to us on the Slack [#symphony][slack] channel. Request an invite at [{code}Community][codecommunity].
-You can also join [Google Groups][googlegroups] and start a discussion.
- 
+
+You can also join [Google Groups][googlegroups] and start a discussion. 
+
 [slack]: https://codecommunity.slack.com/messages/symphony
 [googlegroups]: https://groups.google.com/forum/#!forum/dellemc-symphony
 [codecommunity]: http://community.codedellemc.com/
 [contributing]: http://dellemc-symphony.readthedocs.io/en/latest/contributingtosymphony.html
 [github]: https://github.com/dellemc-symphony
 [documentation]: https://dellemc-symphony.readthedocs.io/en/latest/
-
