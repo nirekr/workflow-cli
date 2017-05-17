@@ -66,7 +66,7 @@ If you want to deploy the released version of the workflow CLI, you can simply d
 
 To execute the workflow CLI:
 
-1. Change the directory to the location where the workflow-cli executable has been downloaded.
+1. Change the directory to the location where you downloaded the workflow-cli executable.
 2. To start the workflow CLI, type the following command: 
 ```
 ./workflow-cli <command>
