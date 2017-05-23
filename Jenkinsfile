@@ -87,37 +87,37 @@ pipeline {
                     cd /go/src/github.com/dellemc-symphony/workflow-cli/
                     make build
 
-                    tar -czvf release-v0.0.1-${BUILD_ID}-windows.tgz bin/windows
-                    tar -czvf release-v0.0.1-${BUILD_ID}-mac.tgz bin/darwin
-                    tar -czvf release-v0.0.1-${BUILD_ID}-linux.tgz bin/linux
+                    tar -czvf release-v0.0.1-${GIT_COMMIT}-windows.tgz bin/windows
+                    tar -czvf release-v0.0.1-${GIT_COMMIT}-mac.tgz bin/darwin
+                    tar -czvf release-v0.0.1-${GIT_COMMIT}-linux.tgz bin/linux
 
                     github-release release \
                         --user dellemc-symphony \
                         --repo workflow-cli \
-                        --tag v0.0.1-${BUILD_ID} \
+                        --tag v0.0.1-${GIT_COMMIT} \
                         --name "Workflow CLI Release" \
                         --description "Workflow CLI Release"
 
                     github-release upload \
                         --user dellemc-symphony \
                         --repo workflow-cli \
-                        --tag v0.0.1-${BUILD_ID} \
+                        --tag v0.0.1-${GIT_COMMIT} \
                         --name "WorkflowCLI-Windows.tgz" \
-                        --file release-v0.0.1-${BUILD_ID}-windows.tgz
+                        --file release-v0.0.1-${GIT_COMMIT}-windows.tgz
 
                     github-release upload \
                         --user dellemc-symphony \
                         --repo workflow-cli \
-                        --tag v0.0.1-${BUILD_ID} \
+                        --tag v0.0.1-${GIT_COMMIT} \
                         --name "WorkflowCLI-Mac.tgz" \
-                        --file release-v0.0.1-${BUILD_ID}-mac.tgz
+                        --file release-v0.0.1-${GIT_COMMIT}-mac.tgz
 
                     github-release upload \
                         --user dellemc-symphony \
                         --repo workflow-cli \
-                        --tag v0.0.1-${BUILD_ID} \
+                        --tag v0.0.1-${GIT_COMMIT} \
                         --name "WorkflowCLI-Linux.tgz" \
-                        --file release-v0.0.1-${BUILD_ID}-linux.tgz
+                        --file release-v0.0.1-${GIT_COMMIT}-linux.tgz
                 '''
             }
         }
