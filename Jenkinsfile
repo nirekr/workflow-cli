@@ -51,10 +51,8 @@ pipeline {
             }
         }
         stage('NexB Scan') {
-            when {
-                expression {
-                    return env.BRANCH_NAME ==~ /master\/.*/
-                }
+              when {
+                branch 'master'
             }
             steps {
                     checkout([$class: 'GitSCM', 
@@ -81,9 +79,7 @@ pipeline {
         }
         stage('Release') {
             when {
-                expression {
-                    return env.BRANCH_NAME ==~ /master\/.*/
-                }
+                branch 'master'
             }
             steps {
                 sh '''
