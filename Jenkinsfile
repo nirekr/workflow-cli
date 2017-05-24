@@ -83,6 +83,8 @@ pipeline {
             }
             steps {
                 sh '''
+		    export GIT_COMMIT=$(git rev-parse HEAD | head -c7)
+		    
                     go get -u github.com/aktau/github-release
                     cd /go/src/github.com/dellemc-symphony/workflow-cli/
                     make build
