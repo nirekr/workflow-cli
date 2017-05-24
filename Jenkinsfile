@@ -77,13 +77,32 @@ pipeline {
 	       	    archiveArtifacts '**/nexb-output/**' 
             }
         }
+        stage('One-time Cleanup') {
+            steps {
+                sh '''
+                    go get -u github.com/aktau/github-release
+
+                    // Temp Cleanup
+		    github-release delete \
+    		    --user dellemc-symphony \
+                    --repo workflow-cli \
+    		    --tag v0.0.1-v0.0.1-9f261e9-1-gc2ab9d4
+		    
+		    github-release delete \
+    		    --user dellemc-symphony \
+                    --repo workflow-cli \
+    		    --tag v0.0.1-9f261e9
+		    
+                '''
+            }
+        }
         stage('Release') {
             when {
                 branch 'master'
             }
             steps {
                 sh '''
-		    export BUILD_ID=$(git describe --tags --always --dirty)
+		    export BUILD_ID=$(git describe --always --dirty)
 		    
                     go get -u github.com/aktau/github-release
                     cd /go/src/github.com/dellemc-symphony/workflow-cli/
