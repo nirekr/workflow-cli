@@ -74,6 +74,11 @@ pipeline {
 	       	    archiveArtifacts '**/nexb-output/**' 
             }
         }
+    	stage('PasswordScan') {
+	    steps {
+		    doPwScan()
+	    }
+    	}
         stage('Release') {
             when {
                 expression {
