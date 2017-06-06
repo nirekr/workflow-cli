@@ -7,7 +7,6 @@ import:
 - package: github.com/hashicorp/go-cleanhttp
 - package: github.com/olekukonko/tablewriter
 - package: github.com/sirupsen/logrus
-  version: ~0.11.4
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
 testImport:
