@@ -15,6 +15,7 @@ pipeline {
     environment {
         GIT_CREDS = credentials('github-03')
         GITHUB_TOKEN = credentials('github-02')
+        RELEASE_BRANCH = develop
     }
     options { 
         buildDiscarder(logRotator(artifactDaysToKeepStr: '30', artifactNumToKeepStr: '5', daysToKeepStr: '30', numToKeepStr: '5'))
@@ -79,7 +80,7 @@ pipeline {
         }
         stage('Release') {
             when {
-                branch 'develop'
+                branch '${RELEASE_BRANCH}'
             }
             steps {
                 sh '''
@@ -99,6 +100,7 @@ pipeline {
                         --tag v0.0.1-${BUILD_ID} \
                         --name "Workflow CLI Release" \
                         --description "Workflow CLI Release"
+                        --target ${RELEASE_BRANCH}
 
                     github-release upload \
                         --user dellemc-symphony \
