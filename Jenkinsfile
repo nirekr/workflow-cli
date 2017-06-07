@@ -15,10 +15,10 @@ pipeline {
     environment {
         GIT_CREDS = credentials('github-03')
         GITHUB_TOKEN = credentials('github-02')
-        RELEASE_BRANCH = develop
+        RELEASE_BRANCH = 'develop'
     }
     options { 
-        buildDiscarder(logRotator(artifactDaysToKeepStr: '30', artifactNumToKeepStr: '5', daysToKeepStr: '30', numToKeepStr: '5'))
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '30', artifactNumToKeepStr: '30', daysToKeepStr: '30', numToKeepStr: '30'))
         timestamps()
     }
     stages {
