@@ -51,6 +51,9 @@ pipeline {
             }
         }
         stage('NexB Scan') {
+              when {
+                branch 'master'
+            }
             steps {
                     checkout([$class: 'GitSCM', 
                               branches: [[name: '*/master']], 
@@ -76,12 +79,12 @@ pipeline {
         }
         stage('Release') {
             when {
-                expression {
-                    return env.BRANCH_NAME ==~ /release\/.*/
-                }
+                branch 'master'
             }
             steps {
                 sh '''
+		    export BUILD_ID=$(git describe --always --dirty)
+		    
                     go get -u github.com/aktau/github-release
                     cd /go/src/github.com/dellemc-symphony/workflow-cli/
                     make build

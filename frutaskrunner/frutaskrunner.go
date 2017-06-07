@@ -150,14 +150,7 @@ func RunTask(r models.Response, target string) error {
 			return nil
 		}
 
-		delay := 0
-		if r.Links[index].Delay != "" {
-			delay, err = strconv.Atoi(r.Links[index].Delay)
-			if err != nil {
-				log.Warnf("Error parsing response: %s", err)
-			}
-
-		}
+		delay := r.Links[index].Delay
 
 		switch r.Links[index].Rel {
 

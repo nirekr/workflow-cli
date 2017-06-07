@@ -497,17 +497,17 @@ func CreateMock(https bool) {
 		id = c.Param("trackingid")
 
 		var nextStep string
-		var delay string
+		var delay int
 
 		// For this step, do 3 "wait" cycles. Overwrite "nextStep" and "delay"
 		if longRunningCount < 3 {
 			longRunningCount++
 			nextStep = "longrunning/scaleio-remove-workflow"
-			delay = "5"
+			delay = 5
 
 		} else {
 			nextStep = steps["longrunning/scaleio-remove-workflow"]
-			delay = ""
+			delay = 0
 			longRunningCount = 0
 		}
 
