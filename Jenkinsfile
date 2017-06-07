@@ -100,7 +100,7 @@ pipeline {
                         --tag v0.0.1-${BUILD_ID} \
                         --name "Workflow CLI Release" \
                         --description "Workflow CLI Release"
-                        --target ${RELEASE_BRANCH}
+                        --target "${RELEASE_BRANCH}"
 
                     github-release upload \
                         --user dellemc-symphony \
