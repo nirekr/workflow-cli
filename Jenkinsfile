@@ -79,7 +79,7 @@ pipeline {
         }
         stage('Release') {
             when {
-                branch 'master'
+                branch 'develop'
             }
             steps {
                 sh '''
