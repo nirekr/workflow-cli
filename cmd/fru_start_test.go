@@ -314,7 +314,8 @@ var _ = Describe("FruStart", func() {
 			outBuf := new(bytes.Buffer)
 			outBuf.ReadFrom(stdout)
 
-			Expect(errBuf.String()).To(ContainSubstring("endpoint.yaml not found, will prompt user"))
+			Expect(errBuf.String()).To(ContainSubstring("Will prompt user for endpoints."))
+			Expect(errBuf.String()).To(ContainSubstring("Config file \"endpoint.yaml\" not found."))
 			Expect(outBuf.String()).To(ContainSubstring(tableString))
 			Expect(outBuf.String()).To(ContainSubstring(nodeSelection))
 			Expect(errBuf.String()).To(ContainSubstring("Workflow complete"))
