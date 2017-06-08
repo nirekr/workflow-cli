@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"syscall"
 
 	"golang.org/x/crypto/ssh/terminal"
@@ -102,7 +103,13 @@ func ParseEndpointsFile() map[string]models.Endpoint {
 
 	err = viper.ReadInConfig()
 	if err != nil {
-		log.Warnf("endpoint.yaml not found, will prompt user\n")
+		if strings.Contains(err.Error(), "no such file or directory") {
+			log.Warnf("Config file \"endpoint.yaml\" not found.")
+		} else {
+			log.Warnf("Invalid endpoint.yaml: %s", err)
+		}
+
+		log.Warnf("Will prompt user for endpoints.")
 		return endpoints
 	}
 
