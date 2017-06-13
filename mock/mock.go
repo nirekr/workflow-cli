@@ -112,11 +112,9 @@ func CreateMock(https bool) {
 	steps["start-scaleio-remove-workflow"] = "longrunning/scaleio-remove-workflow"
 	steps["longrunning/scaleio-remove-workflow"] = "power-off-scaleio-vm"
 	steps["power-off-scaleio-vm"] = "enter-maintanence-mode"
-	steps["enter-maintanence-mode"] = "reboot-host-for-discovery"
-	steps["reboot-host-for-discovery"] = "wait-for-rackhd-discovery"
-	steps["wait-for-rackhd-discovery"] = "instruct-physical-removal"
-	steps["instruct-physical-removal"] = "wait-for-rackhd-discovery2"
-	steps["wait-for-rackhd-discovery2"] = "present-system-list-add"
+	steps["enter-maintanence-mode"] = "instruct-physical-removal"
+	steps["instruct-physical-removal"] = "longrunning/wait-for-rackhd-discovery"
+	steps["longrunning/wait-for-rackhd-discovery"] = "present-system-list-add"
 	steps["present-system-list-add"] = "configure-disks-rackhd"
 	steps["configure-disks-rackhd"] = "install-esxi"
 	steps["install-esxi"] = "add-host-to-vcenter"
@@ -580,7 +578,7 @@ func CreateMock(https bool) {
 		stepNext := models.Link{
 			Rel:    "step-next",
 			Href:   url,
-			Type:   "application/json",
+			Type:   "application/vnd.dellemc.cpsd.removenode",
 			Method: "POST",
 		}
 
@@ -590,64 +588,6 @@ func CreateMock(https bool) {
 			ID:          id,
 			Workflow:    "quanta-replacement-d51b-esxi",
 			CurrentStep: "enter-maintanence-mode",
-			Links:       links,
-		}
-
-		c.JSON(http.StatusCreated, response)
-	})
-
-	router.POST("/fru/api/workflow/:trackingid/reboot-host-for-discovery", func(c *gin.Context) {
-		id = c.Param("trackingid")
-		nextStep := steps["reboot-host-for-discovery"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
-
-		stepNext := models.Link{
-			Rel:    "step-next",
-			Href:   url,
-			Type:   "application/json",
-			Method: "POST",
-		}
-
-		links := models.Links{stepNext}
-
-		response := models.Response{
-			ID:          id,
-			Workflow:    "quanta-replacement-d51b-esxi",
-			CurrentStep: "reboot-host-for-discovery",
-			Links:       links,
-		}
-
-		c.JSON(http.StatusCreated, response)
-	})
-
-	router.POST("/fru/api/workflow/:trackingid/wait-for-rackhd-discovery", func(c *gin.Context) {
-		id = c.Param("trackingid")
-		nextStep := steps["wait-for-rackhd-discovery"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
-
-		stepNext := models.Link{
-			Rel:    "step-next",
-			Href:   url,
-			Type:   "application/json",
-			Method: "POST",
-		}
-
-		links := models.Links{stepNext}
-
-		response := models.Response{
-			ID:          id,
-			Workflow:    "quanta-replacement-d51b-esxi",
-			CurrentStep: "wait-for-rackhd-discovery",
 			Links:       links,
 		}
 
@@ -683,9 +623,27 @@ func CreateMock(https bool) {
 		c.JSON(http.StatusCreated, response)
 	})
 
-	router.POST("/fru/api/workflow/:trackingid/wait-for-rackhd-discovery2", func(c *gin.Context) {
+	router.POST("/fru/api/workflow/:trackingid/longrunning/wait-for-rackhd-discovery", func(c *gin.Context) {
 		id = c.Param("trackingid")
-		nextStep := steps["wait-for-rackhd-discovery2"]
+
+		var nextStep string
+		var delay int
+		var nextType string
+
+		// For this step, do 3 "wait" cycles. Overwrite "nextStep" and "delay"
+		if longRunningCount < 3 {
+			longRunningCount++
+			nextStep = "longrunning/wait-for-rackhd-discovery"
+			delay = 5
+			nextType = "application/json"
+
+		} else {
+			nextStep = steps["longrunning/wait-for-rackhd-discovery"]
+			delay = 0
+			longRunningCount = 0
+			nextType = "application/vnd.dellemc.nodes.list.add+json"
+		}
+
 		var url string
 		if https {
 			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
@@ -696,8 +654,9 @@ func CreateMock(https bool) {
 		stepNext := models.Link{
 			Rel:    "step-next",
 			Href:   url,
-			Type:   "application/vnd.dellemc.nodes.list.add+json",
+			Type:   nextType,
 			Method: "POST",
+			Delay:  delay,
 		}
 
 		links := models.Links{stepNext}
@@ -723,14 +682,18 @@ func CreateMock(https bool) {
 			Status:       "online",
 			UUID:         "fdr56765redfghj",
 		}
+
 		nodes := models.Nodes{node1, node2, node3}
 
 		response := models.Response{
 			ID:          id,
 			Workflow:    "quanta-replacement-d51b-esxi",
-			CurrentStep: "wait-for-rackhd-discovery2",
+			CurrentStep: "wait-for-rackhd-discovery",
 			Links:       links,
-			Nodes:       nodes,
+		}
+
+		if delay == 0 {
+			response.Nodes = nodes
 		}
 
 		c.JSON(http.StatusCreated, response)

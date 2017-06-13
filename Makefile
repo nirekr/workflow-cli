@@ -50,18 +50,18 @@ mock: build-linux
 	go run mock/main/main.go
 
 integration-test: build-linux
-	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bINTEGRATION\b" -- --https=false
-	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bINTEGRATION\b" -- --https=true
+	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=50 --focus="\bINTEGRATION\b" -- --https=false
+	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=50 --focus="\bINTEGRATION\b" -- --https=true
 	cp resources/endpoint_template.yaml $(GOOUT)/linux/endpoint.yaml
 
 unit-test: build-linux
-	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bUNIT\b" -- --https=false
-	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 --focus="\bUNIT\b" -- --https=true
+	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=50 --focus="\bUNIT\b" -- --https=false
+	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=50 --focus="\bUNIT\b" -- --https=true
 	cp resources/endpoint_template.yaml $(GOOUT)/linux/endpoint.yaml
 
 test: build-linux
-	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 -- --https=false
-	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=30 -- --https=true
+	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=50 -- --https=false
+	ginkgo -r -race -trace -cover -randomizeAllSpecs --slowSpecThreshold=50 -- --https=true
 	cp resources/endpoint_template.yaml $(GOOUT)/linux/endpoint.yaml
 
 cover-cmd: test

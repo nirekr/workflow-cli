@@ -96,6 +96,10 @@ var _ = Describe("FruResume", func() {
 
 			// Confirm selection
 			io.WriteString(stdin, "Y\n")
+			time.Sleep(20000 * time.Millisecond)
+
+			//CONTINUE to allow node addition
+			io.WriteString(stdin, "CONTINUE\n")
 			time.Sleep(500 * time.Millisecond)
 
 			// Select node 2 to add

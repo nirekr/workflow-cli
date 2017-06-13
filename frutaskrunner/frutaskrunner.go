@@ -32,9 +32,9 @@ func RunTask(r models.Response, target string) error {
 		return fmt.Errorf("Server error: No next-step or retry-step received")
 	}
 
-	client, err := transport.NewClient(target)
-	if err != nil {
-		log.Fatalf(err.Error())
+	client, clientErr := transport.NewClient(target)
+	if clientErr != nil {
+		log.Fatalf(clientErr.Error())
 	}
 
 	for {
@@ -103,6 +103,27 @@ func RunTask(r models.Response, target string) error {
 			if err != nil {
 				log.Warnf("Could not encode: %+v", nodeSelected)
 				return fmt.Errorf("error encoding credentials body: %s", err)
+			}
+
+		} else if r.Links[index].Type == "application/vnd.dellemc.cpsd.removenode" {
+			fmt.Printf("\nIt is now safe to remove the failed node from the rack.\n")
+			fmt.Println("When the new node has been racked and cabled, please power it on and type CONTINUE ...")
+			ok := false
+			for !ok {
+				scanner := bufio.NewScanner(os.Stdin)
+
+				scanner.Scan()
+				if err := scanner.Err(); err != nil {
+					return fmt.Errorf("Error reading user input: %s", err)
+				}
+
+				input := strings.ToUpper(scanner.Text())
+
+				if input == "CONTINUE" {
+					ok = true
+				} else {
+					fmt.Println("Type CONTINUE when ready ...")
+				}
 			}
 		}
 
@@ -262,20 +283,26 @@ func PresentNodesToUser(action string, nodes models.Nodes) (models.Node, error) 
 		scanner := bufio.NewScanner(os.Stdin)
 		selector = 0
 		for selector < 1 || selector > len(nodes) {
-			// Ask which task to resume, by task-id
-			fmt.Printf("Select a node for action '%s': ", action)
 
-			scanner.Scan()
-			input := scanner.Text()
-			if err = scanner.Err(); err != nil {
-				return models.Node{}, fmt.Errorf("Error reading user input: %s", err)
+			okNodeSelect := false
+			for !okNodeSelect {
+				fmt.Printf("Select a node for action '%s': ", action)
+
+				scanner.Scan()
+				if err = scanner.Err(); err != nil {
+					log.Errorf("Error reading user input: %s", err)
+					continue
+				}
+				input := scanner.Text()
+
+				selector, err = strconv.Atoi(input)
+				if err != nil {
+					log.Errorf("Error parsing user input: \"%s\"\n", input)
+					continue
+				}
+
+				okNodeSelect = true
 			}
-
-			selector, err = strconv.Atoi(input)
-			if err != nil {
-				return models.Node{}, fmt.Errorf("Error parsing user input: %s", err)
-			}
-
 			if selector < 1 || selector > len(nodes) {
 				log.Warnf("Invalid node selection: %d", selector)
 			}
@@ -296,12 +323,12 @@ func PresentNodesToUser(action string, nodes models.Nodes) (models.Node, error) 
 
 		fmt.Printf("Is this the correct node? [Y/N] or Q to quit: ")
 		scanner.Scan()
-
-		input := scanner.Text()
 		fmt.Printf("\n")
 		if err := scanner.Err(); err != nil {
 			return models.Node{}, fmt.Errorf("Error reading user input: %s", err)
 		}
+
+		input := scanner.Text()
 
 		if strings.ToLower(input) == "q" {
 			return models.Node{}, fmt.Errorf("User selected quit")

@@ -37,25 +37,29 @@ func TargetAuth(target string) (string, string, string, error) {
 
 		// Get Address
 		fmt.Printf("Enter %s endpoint: ", target)
-		scanner.Scan()
-		endpoint = scanner.Text()
 
+		scanner.Scan()
 		if err := scanner.Err(); err != nil {
 			log.Warnf("Error reading addr: %s", err)
 			return "", "", "", err
 		}
+
+		endpoint = scanner.Text()
+
 	}
 
 	if username == "" {
 		// Get Username
 		fmt.Printf("Enter %s Username: ", target)
-		scanner.Scan()
-		username = scanner.Text()
 
+		scanner.Scan()
 		if err := scanner.Err(); err != nil {
 			log.Warnf("Error reading username: %s", err)
 			return "", "", "", err
 		}
+
+		username = scanner.Text()
+
 	}
 
 	if password == "" {
@@ -72,12 +76,12 @@ func TargetAuth(target string) (string, string, string, error) {
 
 		} else {
 			scanner.Scan()
-			password = scanner.Text()
-
 			if err := scanner.Err(); err != nil {
 				log.Warnf("\nError reading password: %s", err)
 				return "", "", "", err
 			}
+
+			password = scanner.Text()
 		}
 		fmt.Printf("\n")
 	}

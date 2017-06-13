@@ -90,10 +90,11 @@ Use this command to resume a failed or stopped workflow operation.`,
 		fmt.Printf("Please enter resume task: ")
 
 		scanner.Scan()
-		input := scanner.Text()
 		if err := scanner.Err(); err != nil {
 			log.Warnf("Error reading addr: %s", err)
 		}
+
+		input := scanner.Text()
 
 		selector, err := strconv.Atoi(input)
 		if err != nil {

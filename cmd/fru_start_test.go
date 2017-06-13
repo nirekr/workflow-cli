@@ -26,14 +26,14 @@ var _ = Describe("FruStart", func() {
 	var endpointLocation string
 	var StateFile string
 	var target string
-	var tableString string
+	var nodeList string
 	var nodeSelection string
 
 	BeforeEach(func() {
 		binLocation = fmt.Sprintf("../bin/%s/workflow-cli", runtime.GOOS)
 		endpointLocation = fmt.Sprintf("../bin/%s/endpoint.yaml", runtime.GOOS)
 
-		tableString = `+--------+----------+---------------+------------+----------+
+		nodeList = `+--------+----------+---------------+------------+----------+
 | SELECT | HOSTNAME | SERIAL NUMBER |  MGMT IP   |  STATUS  |
 +--------+----------+---------------+------------+----------+
 |      1 | node01   |       1234567 | 10.10.10.1 | online   |
@@ -99,6 +99,10 @@ var _ = Describe("FruStart", func() {
 
 			//Confirm selection
 			io.WriteString(stdin, "Y\n")
+			time.Sleep(20000 * time.Millisecond)
+
+			//CONTINUE to allow node addition
+			io.WriteString(stdin, "CONTINUE\n")
 			time.Sleep(500 * time.Millisecond)
 
 			// Select node 2 for add
@@ -115,7 +119,9 @@ var _ = Describe("FruStart", func() {
 			outBuf.ReadFrom(stdout)
 
 			Expect(err).To(BeNil())
-			Expect(outBuf.String()).To(ContainSubstring(tableString))
+			Expect(outBuf.String()).To(ContainSubstring("It is now safe to remove the failed node from the rack."))
+			Expect(outBuf.String()).To(ContainSubstring("When the new node has been racked and cabled, please power it on and type CONTINUE ..."))
+			Expect(outBuf.String()).To(ContainSubstring(nodeList))
 			Expect(outBuf.String()).To(ContainSubstring(nodeSelection))
 			Expect(errBuf.String()).To(ContainSubstring("Workflow complete"))
 
@@ -191,6 +197,10 @@ var _ = Describe("FruStart", func() {
 
 			//Password for ScaleIO MDM
 			io.WriteString(stdin, "ScaleIOMDMPassword\n")
+			time.Sleep(20000 * time.Millisecond)
+
+			//CONTINUE to allow node addition
+			io.WriteString(stdin, "CONTINUE\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Select node 2 for addition
@@ -206,7 +216,7 @@ var _ = Describe("FruStart", func() {
 			outBuf := new(bytes.Buffer)
 			outBuf.ReadFrom(stdout)
 
-			Expect(outBuf.String()).To(ContainSubstring(tableString))
+			Expect(outBuf.String()).To(ContainSubstring(nodeList))
 			Expect(outBuf.String()).To(ContainSubstring(nodeSelection))
 			Expect(errBuf.String()).To(ContainSubstring("Workflow complete"))
 
@@ -299,6 +309,10 @@ var _ = Describe("FruStart", func() {
 
 			//Password for ScaleIO MDM
 			io.WriteString(stdin, "ScaleIOMDMPassword\n")
+			time.Sleep(20000 * time.Millisecond)
+
+			//CONTINUE to allow node addition
+			io.WriteString(stdin, "CONTINUE\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Select node 2 for addition
@@ -316,7 +330,7 @@ var _ = Describe("FruStart", func() {
 
 			Expect(errBuf.String()).To(ContainSubstring("Will prompt user for endpoints."))
 			Expect(errBuf.String()).To(ContainSubstring("Config file \"endpoint.yaml\" not found."))
-			Expect(outBuf.String()).To(ContainSubstring(tableString))
+			Expect(outBuf.String()).To(ContainSubstring(nodeList))
 			Expect(outBuf.String()).To(ContainSubstring(nodeSelection))
 			Expect(errBuf.String()).To(ContainSubstring("Workflow complete"))
 
