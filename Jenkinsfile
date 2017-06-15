@@ -59,8 +59,30 @@ pipeline {
             }
         }
         stage('NexB Scan') {
+              when {
+                branch 'master'
+            }
             steps {
-                doNexbScanNonMaven()
+                    checkout([$class: 'GitSCM', 
+                              branches: [[name: '*/master']], 
+                              doGenerateSubmoduleConfigurations: false, 
+                              extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'nexB']], 
+                              submoduleCfg: [], 
+                              userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]]) 
+		    checkout([$class: 'GitSCM', 
+			      branches: [[name: '*/master']], 
+			      doGenerateSubmoduleConfigurations: false, 
+			      extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'workflow-cli']], 
+			      gitTool: 'linux-git', 
+			      submoduleCfg: [], 
+			      userRemoteConfigs: [[credentialsId: 'github-03', url: 'https://github.com/dellemc-symphony/workflow-cli.git']]])
+
+		    sh "mkdir -p nexB/nexb-output/"
+       		    sh "nexB/scancode --help"
+                    sh "nexB/scancode --format html ${WORKSPACE}/workflow-cli nexB/nexb-output/workflow-cli.html"
+		    sh "nexB/scancode --format html-app ${WORKSPACE}/workflow-cli nexB/nexb-output/workflow-cli-grap.html"
+//	            sh "mv nexB/nexb-output/ ${WORKSPACE}/"
+	       	    archiveArtifacts '**/nexb-output/**' 
             }
         }
         stage('Release') {
