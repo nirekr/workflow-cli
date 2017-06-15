@@ -60,7 +60,7 @@ pipeline {
         }
         stage('NexB Scan') {
             steps {
-                doNexbScanNonMaven
+                doNexbScanNonMaven()
             }
         }
         stage('Release') {
