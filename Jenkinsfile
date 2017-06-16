@@ -18,10 +18,17 @@ pipeline {
         RELEASE_BRANCH = 'develop'
     }
     options { 
+        skipDefaultCheckout()
         buildDiscarder(logRotator(artifactDaysToKeepStr: '30', artifactNumToKeepStr: '30', daysToKeepStr: '30', numToKeepStr: '30'))
         timestamps()
+        disableConcurrentBuilds()
     }
     stages {
+        stage('Checkout') {
+            steps {
+                doCheckout()
+	    }
+	}
         stage('Dependencies') {
             steps {
                 sh '''
@@ -35,7 +42,7 @@ pipeline {
                 '''
             }
         }
-	    stage('Unit Tests') {
+	stage('Unit Tests') {
             steps {
                 sh '''
                     cd /go/src/github.com/dellemc-symphony/workflow-cli/
@@ -127,22 +134,14 @@ pipeline {
         }
     }
     post {
-        always{
-            step([$class: 'WsCleanup'])   
+        always {
+            cleanWorkspace()   
         }
-	success {
-            emailext attachLog: true, 
-                body: 'Pipeline job ${JOB_NAME} success. Build URL: ${BUILD_URL}', 
-                recipientProviders: [[$class: 'CulpritsRecipientProvider']], 
-                subject: 'SUCCESS: Jenkins Job- ${JOB_NAME} Build No- ${BUILD_NUMBER}', 
-                to: 'pebuildrelease@vce.com'            
+        success {
+            successEmail()
         }
         failure {
-            emailext attachLog: true, 
-                body: 'Pipeline job ${JOB_NAME} failed. Build URL: ${BUILD_URL}', 
-                recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'], [$class: 'FailingTestSuspectsRecipientProvider'], [$class: 'UpstreamComitterRecipientProvider']], 
-                subject: 'FAILED: Jenkins Job- ${JOB_NAME} Build No- ${BUILD_NUMBER}', 
-                to: 'pebuildrelease@vce.com'
+            failureEmail()
         }
     }
 }
