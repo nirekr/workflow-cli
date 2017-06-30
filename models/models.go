@@ -45,11 +45,12 @@ type Link struct {
 
 // Node is a struct ...
 type Node struct {
-	Hostname     string `json:"hostname,omitempty"`
-	SerialNumber string `json:"serialNumber,omitempty"`
-	ManagementIP string `json:"mgmtIP,omitempty"`
-	Status       string `json:"status,omitempty"`
-	UUID         string `json:"uuid,omitempty"`
+	Hostname        string `json:"hostname,omitempty"`
+	ServiceTag      string `json:"serviceTag,omitempty"`
+	ManagementIP    string `json:"mgmtIP,omitempty"`
+	PowerStatus     string `json:"powerStatus,omitempty"`
+	ConnectionState string `json:"connectionState,omitempty"`
+	UUID            string `json:"uuid,omitempty"`
 }
 
 // MockDataResponse is a struct ...
