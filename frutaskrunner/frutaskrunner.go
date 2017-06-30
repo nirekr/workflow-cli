@@ -267,15 +267,16 @@ func PresentNodesToUser(action string, nodes models.Nodes) (models.Node, error) 
 	for !ok {
 		// Print result
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"Select", "Hostname", "Serial Number", "Mgmt IP", "Status"})
+		table.SetHeader([]string{"Select", "Hostname", "Service Tag", "Mgmt IP", "Power Status", "Connection State"})
 
 		for index, node := range nodes {
 			table.Append([]string{
 				fmt.Sprintf("%d", index+1),
 				node.Hostname,
-				node.SerialNumber,
+				node.ServiceTag,
 				node.ManagementIP,
-				node.Status,
+				node.PowerStatus,
+				node.ConnectionState,
 			})
 		}
 		table.Render()
@@ -311,12 +312,13 @@ func PresentNodesToUser(action string, nodes models.Nodes) (models.Node, error) 
 		selectedNode = nodes[selector-1]
 
 		selectedTable := tablewriter.NewWriter(os.Stdout)
-		selectedTable.SetHeader([]string{"Hostname", "Serial Number", "Mgmt IP", "Status"})
+		selectedTable.SetHeader([]string{"Hostname", "Service Tag", "Mgmt IP", "Power Status", "Connection State"})
 		selectedTable.Append([]string{
 			selectedNode.Hostname,
-			selectedNode.SerialNumber,
+			selectedNode.ServiceTag,
 			selectedNode.ManagementIP,
-			selectedNode.Status,
+			selectedNode.PowerStatus,
+			selectedNode.ConnectionState,
 		})
 		fmt.Printf("\n")
 		selectedTable.Render()

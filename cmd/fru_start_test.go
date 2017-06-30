@@ -33,20 +33,19 @@ var _ = Describe("FruStart", func() {
 		binLocation = fmt.Sprintf("../bin/%s/workflow-cli", runtime.GOOS)
 		endpointLocation = fmt.Sprintf("../bin/%s/endpoint.yaml", runtime.GOOS)
 
-		nodeList = `+--------+----------+---------------+------------+----------+
-| SELECT | HOSTNAME | SERIAL NUMBER |  MGMT IP   |  STATUS  |
-+--------+----------+---------------+------------+----------+
-|      1 | node01   |       1234567 | 10.10.10.1 | online   |
-|      2 | node02   |      98765432 | 10.10.10.2 | degraded |
-|      3 | node03   |      91827465 | 10.10.10.3 | online   |
-+--------+----------+---------------+------------+----------+
+		nodeList = `+--------+----------+-------------+------------+--------------+------------------+
+| SELECT | HOSTNAME | SERVICE TAG |  MGMT IP   | POWER STATUS | CONNECTION STATE |
++--------+----------+-------------+------------+--------------+------------------+
+|      1 | node01   |     1234567 | 10.10.10.1 | poweredOn    | Connected        |
+|      2 | node02   |    98765432 | 10.10.10.2 | poweredOn    | Connected        |
+|      3 | node03   |    91827465 | 10.10.10.3 | poweredOn    | Connected        |
++--------+----------+-------------+------------+--------------+------------------+
 `
-
-		nodeSelection = `+----------+---------------+------------+----------+
-| HOSTNAME | SERIAL NUMBER |  MGMT IP   |  STATUS  |
-+----------+---------------+------------+----------+
-| node02   |      98765432 | 10.10.10.2 | degraded |
-+----------+---------------+------------+----------+
+		nodeSelection = `+----------+-------------+------------+--------------+------------------+
+| HOSTNAME | SERVICE TAG |  MGMT IP   | POWER STATUS | CONNECTION STATE |
++----------+-------------+------------+--------------+------------------+
+| node02   |    98765432 | 10.10.10.2 | poweredOn    | Connected        |
++----------+-------------+------------+--------------+------------------+
 `
 
 		dir, err := homedir.Dir()

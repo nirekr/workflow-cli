@@ -361,26 +361,29 @@ func CreateMock(https bool) {
 		links := models.Links{stepNext}
 
 		node1 := models.Node{
-			Hostname:     "node01",
-			SerialNumber: "1234567",
-			ManagementIP: "10.10.10.1",
-			Status:       "online",
-			UUID:         "213894yu924h6ao",
+			Hostname:        "node01",
+			ServiceTag:      "1234567",
+			ManagementIP:    "10.10.10.1",
+			PowerStatus:     "poweredOn",
+			ConnectionState: "Connected",
+			UUID:            "213894yu924h6ao",
 		}
 
 		node2 := models.Node{
-			Hostname:     "node02",
-			SerialNumber: "98765432",
-			ManagementIP: "10.10.10.2",
-			Status:       "degraded",
-			UUID:         "654edcvbhnjki87",
+			Hostname:        "node02",
+			ServiceTag:      "98765432",
+			ManagementIP:    "10.10.10.2",
+			PowerStatus:     "poweredOn",
+			ConnectionState: "Connected",
+			UUID:            "654edcvbhnjki87",
 		}
 		node3 := models.Node{
-			Hostname:     "node03",
-			SerialNumber: "91827465",
-			ManagementIP: "10.10.10.3",
-			Status:       "online",
-			UUID:         "fdr56765redfghj",
+			Hostname:        "node03",
+			ServiceTag:      "91827465",
+			ManagementIP:    "10.10.10.3",
+			PowerStatus:     "poweredOn",
+			ConnectionState: "Connected",
+			UUID:            "fdr56765redfghj",
 		}
 		nodes := models.Nodes{node1, node2, node3}
 
@@ -662,25 +665,28 @@ func CreateMock(https bool) {
 		links := models.Links{stepNext}
 
 		node1 := models.Node{
-			Hostname:     "node01",
-			SerialNumber: "1234567",
-			ManagementIP: "10.10.10.1",
-			Status:       "online",
-			UUID:         "213894yu924h6ao",
+			Hostname:        "node01",
+			ServiceTag:      "1234567",
+			ManagementIP:    "10.10.10.1",
+			PowerStatus:     "poweredOn",
+			ConnectionState: "Connected",
+			UUID:            "213894yu924h6ao",
 		}
 		node2 := models.Node{
-			Hostname:     "node02",
-			SerialNumber: "98765432",
-			ManagementIP: "10.10.10.2",
-			Status:       "available",
-			UUID:         "654edcvbhnjki87",
+			Hostname:        "node02",
+			ServiceTag:      "98765432",
+			ManagementIP:    "10.10.10.2",
+			PowerStatus:     "poweredOn",
+			ConnectionState: "Connected",
+			UUID:            "654edcvbhnjki87",
 		}
 		node3 := models.Node{
-			Hostname:     "node03",
-			SerialNumber: "91827465",
-			ManagementIP: "10.10.10.3",
-			Status:       "online",
-			UUID:         "fdr56765redfghj",
+			Hostname:        "node03",
+			ServiceTag:      "91827465",
+			ManagementIP:    "10.10.10.3",
+			PowerStatus:     "poweredOn",
+			ConnectionState: "Connected",
+			UUID:            "fdr56765redfghj",
 		}
 
 		nodes := models.Nodes{node1, node2, node3}
