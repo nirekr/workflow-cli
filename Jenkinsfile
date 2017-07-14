@@ -59,30 +59,26 @@ pipeline {
             }
         }
         stage('NexB Scan') {
-              when {
-                branch 'master'
-            }
-            steps {
+             steps {
                     checkout([$class: 'GitSCM', 
                               branches: [[name: '*/master']], 
                               doGenerateSubmoduleConfigurations: false, 
                               extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'nexB']], 
                               submoduleCfg: [], 
                               userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]]) 
-		    checkout([$class: 'GitSCM', 
-			      branches: [[name: '*/master']], 
+		     checkout changelog: false, poll: false, scm: [$class: 'GitSCM', 
+			      branches: [[name: '*/develop']], 
 			      doGenerateSubmoduleConfigurations: false, 
 			      extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'workflow-cli']], 
-			      gitTool: 'linux-git', 
-			      submoduleCfg: [], 
-			      userRemoteConfigs: [[credentialsId: 'github-03', url: 'https://github.com/dellemc-symphony/workflow-cli.git']]])
-
-		    sh "mkdir -p nexB/nexb-output/"
+			      gitTool: 'linux-git', submoduleCfg: [], 
+			      userRemoteConfigs: [[credentialsId: 'github-03', url: 'https://github.com/dellemc-symphony/workflow-cli.git']]]
+            
+		    sh "mkdir -p  ${WORKSPACE}/nexb-output/"
        		    sh "nexB/scancode --help"
-                    sh "nexB/scancode --format html ${WORKSPACE}/workflow-cli nexB/nexb-output/workflow-cli.html"
-		    sh "nexB/scancode --format html-app ${WORKSPACE}/workflow-cli nexB/nexb-output/workflow-cli-grap.html"
-//	            sh "mv nexB/nexb-output/ ${WORKSPACE}/"
-	       	    archiveArtifacts '**/nexb-output/**' 
+		    sh "nexB/scancode --format html workflow-cli ${WORKSPACE}/nexb-output/workflow-cli.html"
+		    sh "nexB/scancode --format html-app workflow-cli ${WORKSPACE}/nexb-output/workflow-cli-grap.html"
+		    archiveArtifacts '**/nexb-output/**'
+	       	
             }
         }
         stage('Release') {
