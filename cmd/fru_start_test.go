@@ -12,17 +12,17 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"time"
 
 	"github.com/dellemc-symphony/workflow-cli/resources"
-	homedir "github.com/mitchellh/go-homedir"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("FruStart", func() {
-	var binLocation string
+	var binFile string
 	var endpointLocation string
 	var StateFile string
 	var target string
@@ -30,7 +30,7 @@ var _ = Describe("FruStart", func() {
 	var nodeSelection string
 
 	BeforeEach(func() {
-		binLocation = fmt.Sprintf("../bin/%s/workflow-cli", runtime.GOOS)
+		binFile = fmt.Sprintf("../bin/%s/workflow-cli", runtime.GOOS)
 		endpointLocation = fmt.Sprintf("../bin/%s/endpoint.yaml", runtime.GOOS)
 
 		nodeList = `+--------+----------+-------------+------------+--------------+------------------+
@@ -48,7 +48,7 @@ var _ = Describe("FruStart", func() {
 +----------+-------------+------------+--------------+------------------+
 `
 
-		dir, err := homedir.Dir()
+		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 		Expect(err).ToNot(HaveOccurred())
 		StateFile = fmt.Sprintf("%s/.cli", dir)
 
@@ -58,7 +58,7 @@ var _ = Describe("FruStart", func() {
 			target = "http://localhost:8080"
 		}
 
-		cmd := exec.Command(binLocation, "target", target)
+		cmd := exec.Command(binFile, "target", target)
 		err = cmd.Run()
 		Expect(err).To(BeNil())
 
@@ -76,7 +76,7 @@ var _ = Describe("FruStart", func() {
 
 			startTime := time.Now()
 
-			cmd := exec.Command(binLocation, "fru", "start")
+			cmd := exec.Command(binFile, "fru", "start")
 
 			stdin, err := cmd.StdinPipe()
 			Expect(err).To(BeNil())
@@ -134,7 +134,7 @@ var _ = Describe("FruStart", func() {
 			err := resources.WriteEndpointsFile("MissingCredentials", endpointLocation)
 			Expect(err).To(BeNil())
 
-			cmd := exec.Command(binLocation, "fru", "start")
+			cmd := exec.Command(binFile, "fru", "start")
 
 			stdin, err := cmd.StdinPipe()
 			Expect(err).To(BeNil())
@@ -226,7 +226,7 @@ var _ = Describe("FruStart", func() {
 
 	Context("When the endpoint file is missing", func() {
 		It("UNIT should prompt for endpoints and creds", func() {
-			cmd := exec.Command(binLocation, "fru", "start")
+			cmd := exec.Command(binFile, "fru", "start")
 
 			stdin, err := cmd.StdinPipe()
 			Expect(err).To(BeNil())

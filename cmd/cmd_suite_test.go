@@ -33,7 +33,7 @@ var router *gin.Engine
 
 var _ = BeforeSuite(func() {
 	mock.CreateMock(https)
-	time.Sleep(25 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 })
 
 var _ = AfterSuite(func() {

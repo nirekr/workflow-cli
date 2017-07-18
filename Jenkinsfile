@@ -7,7 +7,7 @@
 pipeline {
     agent {
         docker {
-            image 'rackhd/golang:1.8.0'
+            image 'rackhd/golang:1.8.3'
             label 'maven-builder'
 	    customWorkspace "workspace/${env.JOB_NAME}"
         }
@@ -17,7 +17,7 @@ pipeline {
         GITHUB_TOKEN = credentials('github-02')
         RELEASE_BRANCH = 'develop'
     }
-    options { 
+    options {
         skipDefaultCheckout()
         buildDiscarder(logRotator(artifactDaysToKeepStr: '30', artifactNumToKeepStr: '30', daysToKeepStr: '30', numToKeepStr: '30'))
         timestamps()
@@ -60,25 +60,25 @@ pipeline {
         }
         stage('NexB Scan') {
              steps {
-                    checkout([$class: 'GitSCM', 
-                              branches: [[name: '*/master']], 
-                              doGenerateSubmoduleConfigurations: false, 
-                              extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'nexB']], 
-                              submoduleCfg: [], 
-                              userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]]) 
-		     checkout changelog: false, poll: false, scm: [$class: 'GitSCM', 
-			      branches: [[name: '*/develop']], 
-			      doGenerateSubmoduleConfigurations: false, 
-			      extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'workflow-cli']], 
-			      gitTool: 'linux-git', submoduleCfg: [], 
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: '*/master']],
+                              doGenerateSubmoduleConfigurations: false,
+                              extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'nexB']],
+                              submoduleCfg: [],
+                              userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]])
+		     checkout changelog: false, poll: false, scm: [$class: 'GitSCM',
+			      branches: [[name: '*/develop']],
+			      doGenerateSubmoduleConfigurations: false,
+			      extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'workflow-cli']],
+			      gitTool: 'linux-git', submoduleCfg: [],
 			      userRemoteConfigs: [[credentialsId: 'github-03', url: 'https://github.com/dellemc-symphony/workflow-cli.git']]]
-            
+
 		    sh "mkdir -p  ${WORKSPACE}/nexb-output/"
        		    sh "nexB/scancode --help"
 		    sh "nexB/scancode --format html workflow-cli ${WORKSPACE}/nexb-output/workflow-cli.html"
 		    sh "nexB/scancode --format html-app workflow-cli ${WORKSPACE}/nexb-output/workflow-cli-grap.html"
 		    archiveArtifacts '**/nexb-output/**'
-	       	
+
             }
         }
         stage('Release') {
@@ -88,7 +88,7 @@ pipeline {
             steps {
                 sh '''
 		    export BUILD_ID=$(git describe --always --dirty)
-		    
+
                     go get -u github.com/aktau/github-release
                     cd /go/src/github.com/dellemc-symphony/workflow-cli/
                     make build
@@ -131,7 +131,7 @@ pipeline {
     }
     post {
         always {
-            cleanWorkspace()   
+            cleanWorkspace()
         }
         success {
             successEmail()

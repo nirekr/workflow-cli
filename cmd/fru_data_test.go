@@ -10,20 +10,20 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 
-	homedir "github.com/mitchellh/go-homedir"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("FruData", func() {
-	var binLocation string
+	var binFile string
 	var StateFile string
 	var target string
 	BeforeEach(func() {
-		binLocation = fmt.Sprintf("../bin/%s/workflow-cli", runtime.GOOS)
-		dir, err := homedir.Dir()
+		binFile = fmt.Sprintf("../bin/%s/workflow-cli", runtime.GOOS)
+		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 		Expect(err).ToNot(HaveOccurred())
 		StateFile = fmt.Sprintf("%s/.cli", dir)
 
@@ -33,7 +33,7 @@ var _ = Describe("FruData", func() {
 			target = "http://localhost:8080"
 		}
 
-		cmd := exec.Command(binLocation, "target", target)
+		cmd := exec.Command(binFile, "target", target)
 		_, err = cmd.CombinedOutput()
 		Expect(err).To(BeNil())
 	})
@@ -44,7 +44,7 @@ var _ = Describe("FruData", func() {
 
 	Context("When command is called", func() {
 		It("UNIT should print called message", func() {
-			cmd := exec.Command(binLocation, "fru", "data", "47daaa4d-8c4f-40cd-84db-901963d1fc0c")
+			cmd := exec.Command(binFile, "fru", "data", "47daaa4d-8c4f-40cd-84db-901963d1fc0c")
 			output, err := cmd.CombinedOutput()
 			Expect(err).To(BeNil())
 

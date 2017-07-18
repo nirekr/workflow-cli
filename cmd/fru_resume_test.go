@@ -12,12 +12,12 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"time"
 
 	"github.com/dellemc-symphony/workflow-cli/frutaskrunner"
 	"github.com/dellemc-symphony/workflow-cli/resources"
-	homedir "github.com/mitchellh/go-homedir"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -31,7 +31,7 @@ var _ = Describe("FruResume", func() {
 	var StateFile string
 
 	BeforeEach(func() {
-		dir, err := homedir.Dir()
+		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 		Expect(err).ToNot(HaveOccurred())
 		StateFile = fmt.Sprintf("%s/.cli", dir)
 

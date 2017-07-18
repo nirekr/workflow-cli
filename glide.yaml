@@ -3,19 +3,20 @@ import:
 - package: github.com/braintree/manners
   version: ~0.4.0
 - package: github.com/gin-gonic/gin
-  version: ~1.1.4
+  version: ~1.2.0
 - package: github.com/hashicorp/go-cleanhttp
 - package: github.com/olekukonko/tablewriter
 - package: github.com/sirupsen/logrus
+  version: ~1.0.2
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
-testImport:
-- package: github.com/mitchellh/go-homedir
-- package: github.com/onsi/ginkgo
-  version: ~1.2.0
-- package: github.com/onsi/gomega
-  version: ~1.0.0
+- package: golang.org/x/crypto
   subpackages:
-  - ghttp
+  - ssh/terminal
+testImport:
+- package: github.com/onsi/ginkgo
+  version: ~1.4.0
+- package: github.com/onsi/gomega
+  version: ~1.2.0
 - package: gopkg.in/gin-gonic/gin.v1
-  version: ~1.1.4
+  version: ~1.2.0

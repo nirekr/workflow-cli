@@ -9,8 +9,8 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
-	homedir "github.com/mitchellh/go-homedir"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -42,18 +42,18 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	RootCmd.PersistentFlags().StringVar(&configFile, "config", "default", "config file (default is $HOME/.cli)")
+	RootCmd.PersistentFlags().StringVar(&configFile, "config", "default", "Location of the configuration file")
 }
 
 func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	if configFile == "default" {
-		home, err := homedir.Dir()
+		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 		if err != nil {
-			log.Fatalf("Could not read HOME directory: %s", err.Error())
+			log.Fatalf("Could not read application directory: %s", err.Error())
 		}
-		configFile = fmt.Sprintf("%s/.cli", home)
+		configFile = fmt.Sprintf("%s/.cli", dir)
 
 	}
 	// If a config file is found, read it in.
