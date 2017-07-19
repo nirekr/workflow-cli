@@ -55,7 +55,7 @@ RackHD:
   password:
     - "admin"
 
-CoprHD:
+HostBMC:
   endpoint:
     - "https://10.10.10.10:9090"
   username:
@@ -71,15 +71,7 @@ vCenter:
   password:
     - "admin"
 
-ScaleIO:
-  endpoint:
-    - "https://10.10.10.10:9090"
-  username:
-    - "admin"
-  password:
-    - "admin"
-
-ScaleIO_MDM:
+ScaleIOGateway:
   endpoint:
     - "https://10.10.10.10:9090"
   username:
@@ -91,6 +83,7 @@ const missingEndpoints = `
 # Endpoints for FRU-PAQX workflow
 ---
 MinimumVersion: v0.0.1-32
+
 RackHD:
   endpoint:
 #    - "https://10.10.10.10:9090"
@@ -98,13 +91,15 @@ RackHD:
     - "admin"
   password:
     - "admin"
-CoprHD:
+
+HostBMC:
   endpoint:
 #    - "https://10.10.10.10:9090"
   username:
     - "admin"
   password:
     - "admin"
+
 vCenter:
   endpoint:
 #    - "https://10.10.10.10:9090"
@@ -112,14 +107,8 @@ vCenter:
     - "admin"
   password:
     - "admin"
-ScaleIO:
-  endpoint:
-#    - "https://10.10.10.10:9090"
-  username:
-    - "admin"
-  password:
-    - "admin"
-ScaleIO_MDM:
+
+ScaleIOGateway:
   endpoint:
 #    - "https://10.10.10.10:9090"
   username:
@@ -131,6 +120,7 @@ const missingCredentials = `
 # Endpoints for FRU-PAQX workflow
 ---
 MinimumVersion: v0.0.1-32
+
 RackHD:
   endpoint:
     - "https://10.10.10.10:9090"
@@ -138,13 +128,15 @@ RackHD:
 #    - "admin"
   password:
 #    - "admin"
-CoprHD:
+
+HostBMC:
   endpoint:
     - "https://10.10.10.10:9090"
   username:
 #    - "admin"
   password:
 #    - "admin"
+
 vCenter:
   endpoint:
     - "https://10.10.10.10:9090"
@@ -152,14 +144,8 @@ vCenter:
 #    - "admin"
   password:
 #    - "admin"
-ScaleIO:
-  endpoint:
-    - "https://10.10.10.10:9090"
-  username:
-#    - "admin"
-  password:
-#    - "admin"
-ScaleIO_MDM:
+
+ScaleIOGateway:
   endpoint:
     - "https://10.10.10.10:9090"
   username:

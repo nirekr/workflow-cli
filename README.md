@@ -9,7 +9,7 @@ The workflow CLI is written in Golang. It supports native execution on a variety
 You can find additional documentation for Project Symphony at [dellemc-symphony.readthedocs.io][documentation].
 
 ## Before you begin
- 
+
 Verify that the following tool is installed:
 
 * Go Programming Language release 1.8 (go1.8) or higher  
@@ -19,10 +19,10 @@ Verify that the following tool is installed:
 Dell EMC strongly encourages you to build this project on a Linux or Mac environment. The instructions that follow will work on either Linux or Mac.
 
 To install dependencies:
-```	
+```
 make deps
 ```
-	
+
 To build a binary for all operating systems:
 ```
 make build
@@ -49,7 +49,7 @@ make test
 ```
 
 To run Integration Test:
-```	
+```
 make integration-test
 ```
 
@@ -67,12 +67,12 @@ If you want to deploy the released version of the workflow CLI, you can simply d
 To execute the workflow CLI:
 
 1. Change the directory to the location where you downloaded the workflow-cli executable.
-2. To start the workflow CLI, type the following command: 
+2. To start the workflow CLI, type the following command:
 ```
 ./workflow-cli <command>
 ```
   Where *&lt;command&gt;* is one of the following:
-  
+
 | Command | Description |
 | --- | --- |
 | `fru` | Executes a field replacement workflow. The **fru** command supports several child commands, including **data**, **resume**, and **start**. The **fru data** command displays the data gathered for the FRU workflow. The **fru resume** command restarts execution of a failed FRU workflow from the last successful step in the process. The **fru start** command begins a FRU workflow.|
@@ -80,8 +80,8 @@ To execute the workflow CLI:
 | `status` | Retrieves the current status of the system. |
 | `target` | Sets the target location (IP address and port) for the FRU PAQX service. |
 | `version` | Prints version information for the CLI tool. |
- 
-To execute the workflow CLI for FRU: 
+
+To execute the workflow CLI for FRU:
 
 1. Set the target IP address and port for the FRU PAQX service by running this command: `./workflow-cli target http://<ip address:port>`
 
@@ -91,9 +91,9 @@ To execute the workflow CLI for FRU:
 
   When you initiate the FRU workflow, the CLI may prompt you for the following pieces of information:
   - RackHD IP endpoint, user name, and password
-  - CoprHD IP endpoint, user name, and password
+  - HostBMC IP endpoint, user name, and password
   - vCenter IP endpoint, user name, and password
-  - ScaleIO IP endpoint, user name, and password 
+  - ScaleIOGateway IP endpoint, user name, and password
 
   The workflow CLI can read these values from the `endpoint.yaml` file, if you provide them. For any value not provided in the `endpoint.yaml` file, the workflow CLI displays a prompt to allow you to specify the value at runtime.  
 
@@ -110,7 +110,7 @@ Contribute code and make submissions at the relevant GitHub repository level. Se
 
 Reach out to us on the Slack [#symphony][slack] channel. Request an invite at [{code}Community][codecommunity].
 
-You can also join [Google Groups][googlegroups] and start a discussion. 
+You can also join [Google Groups][googlegroups] and start a discussion.
 
 [slack]: https://codecommunity.slack.com/messages/symphony
 [googlegroups]: https://groups.google.com/forum/#!forum/dellemc-symphony

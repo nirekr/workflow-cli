@@ -28,8 +28,12 @@ var _ = Describe("FruStart", func() {
 	var target string
 	var nodeList string
 	var nodeSelection string
+	var longDelay time.Duration
 
 	BeforeEach(func() {
+
+		longDelay = 35000
+
 		binFile = fmt.Sprintf("../bin/%s/workflow-cli", runtime.GOOS)
 		endpointLocation = fmt.Sprintf("../bin/%s/endpoint.yaml", runtime.GOOS)
 
@@ -98,7 +102,7 @@ var _ = Describe("FruStart", func() {
 
 			//Confirm selection
 			io.WriteString(stdin, "Y\n")
-			time.Sleep(20000 * time.Millisecond)
+			time.Sleep(longDelay * time.Millisecond)
 
 			//CONTINUE to allow node addition
 			io.WriteString(stdin, "CONTINUE\n")
@@ -158,12 +162,12 @@ var _ = Describe("FruStart", func() {
 			io.WriteString(stdin, "RackHDPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
-			//Username for CoprHD
-			io.WriteString(stdin, "CoprHDusername\n")
+			//Username for HostBMC
+			io.WriteString(stdin, "HostBMCusername\n")
 			time.Sleep(500 * time.Millisecond)
 
-			//Password for CoprHD
-			io.WriteString(stdin, "CoprHDpassword\n")
+			//Password for HostBMC
+			io.WriteString(stdin, "HostBMCpassword\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Username for vCenter
@@ -174,12 +178,12 @@ var _ = Describe("FruStart", func() {
 			io.WriteString(stdin, "vCenterPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
-			//Username for ScaleIO
-			io.WriteString(stdin, "ScaleIOUsername\n")
+			//Username for ScaleIOGateway
+			io.WriteString(stdin, "ScaleIOGatewayUsername\n")
 			time.Sleep(500 * time.Millisecond)
 
-			//Password for ScaleIO
-			io.WriteString(stdin, "ScaleIOPassword\n")
+			//Password for ScaleIOGateway
+			io.WriteString(stdin, "ScaleIOGatewayPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Select node 2 for removal
@@ -188,15 +192,7 @@ var _ = Describe("FruStart", func() {
 
 			// Confirm selection
 			io.WriteString(stdin, "Y\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Username for ScaleIO MDM
-			io.WriteString(stdin, "ScaleIOMDMUsername\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Password for ScaleIO MDM
-			io.WriteString(stdin, "ScaleIOMDMPassword\n")
-			time.Sleep(20000 * time.Millisecond)
+			time.Sleep(longDelay * time.Millisecond)
 
 			//CONTINUE to allow node addition
 			io.WriteString(stdin, "CONTINUE\n")
@@ -254,16 +250,16 @@ var _ = Describe("FruStart", func() {
 			io.WriteString(stdin, "RackHDPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
-			//Endpoint for CoprHD
-			io.WriteString(stdin, "CoprHDEndpoint\n")
+			//Endpoint for HostBMC
+			io.WriteString(stdin, "HostBMCEndpoint\n")
 			time.Sleep(500 * time.Millisecond)
 
-			//Username for CoprHD
-			io.WriteString(stdin, "CoprHDusername\n")
+			//Username for HostBMC
+			io.WriteString(stdin, "HostBMCusername\n")
 			time.Sleep(500 * time.Millisecond)
 
-			//Password for CoprHD
-			io.WriteString(stdin, "CoprHDpassword\n")
+			//Password for HostBMC
+			io.WriteString(stdin, "HostBMCpassword\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Endpoint for vCenter
@@ -278,16 +274,16 @@ var _ = Describe("FruStart", func() {
 			io.WriteString(stdin, "vCenterPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
-			//Endpoint for ScaleIO
-			io.WriteString(stdin, "ScaleIOEndpoint\n")
+			//Endpoint for ScaleIOGateway
+			io.WriteString(stdin, "ScaleIOGatewayEndpoint\n")
 			time.Sleep(500 * time.Millisecond)
 
-			//Username for ScaleIO
-			io.WriteString(stdin, "ScaleIOUsername\n")
+			//Username for ScaleIOGateway
+			io.WriteString(stdin, "ScaleIOGatewayUsername\n")
 			time.Sleep(500 * time.Millisecond)
 
-			//Password for ScaleIO
-			io.WriteString(stdin, "ScaleIOPassword\n")
+			//Password for ScaleIOGateway
+			io.WriteString(stdin, "ScaleIOGatewayPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Select node 2 for removal
@@ -296,19 +292,7 @@ var _ = Describe("FruStart", func() {
 
 			// Confirm selection
 			io.WriteString(stdin, "Y\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Endpoint for ScaleIO MDM
-			io.WriteString(stdin, "ScaleIOMDMEndpoint\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Username for ScaleIO MDM
-			io.WriteString(stdin, "ScaleIOMDMUsername\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Password for ScaleIO MDM
-			io.WriteString(stdin, "ScaleIOMDMPassword\n")
-			time.Sleep(20000 * time.Millisecond)
+			time.Sleep(longDelay * time.Millisecond)
 
 			//CONTINUE to allow node addition
 			io.WriteString(stdin, "CONTINUE\n")
@@ -328,7 +312,8 @@ var _ = Describe("FruStart", func() {
 			outBuf.ReadFrom(stdout)
 
 			Expect(errBuf.String()).To(ContainSubstring("Will prompt user for endpoints."))
-			Expect(errBuf.String()).To(ContainSubstring("Config file \\\"endpoint.yaml\\\" not found."))
+			Expect(errBuf.String()).To(ContainSubstring("Config file "))
+			Expect(errBuf.String()).To(ContainSubstring("not found."))
 			Expect(outBuf.String()).To(ContainSubstring(nodeList))
 			Expect(outBuf.String()).To(ContainSubstring(nodeSelection))
 			Expect(errBuf.String()).To(ContainSubstring("Workflow complete"))

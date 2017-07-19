@@ -101,14 +101,13 @@ func CreateMock(https bool) {
 
 	steps := make(map[string]string)
 	steps[""] = "capture-rackhd-endpoint"
-	steps["capture-rackhd-endpoint"] = "capture-coprhd-endpoint"
-	steps["capture-coprhd-endpoint"] = "capture-vcenter-endpoint"
+	steps["capture-rackhd-endpoint"] = "capture-hostbmc-endpoint"
+	steps["capture-hostbmc-endpoint"] = "capture-vcenter-endpoint"
 	steps["capture-vcenter-endpoint"] = "capture-scaleio-endpoint"
 	steps["capture-scaleio-endpoint"] = "start-scaleio-data-collection"
 	steps["start-scaleio-data-collection"] = "start-vcenter-data-collection"
 	steps["start-vcenter-data-collection"] = "present-system-list-remove"
-	steps["present-system-list-remove"] = "capture-scaleio-mdm-credentials"
-	steps["capture-scaleio-mdm-credentials"] = "start-scaleio-remove-workflow"
+	steps["present-system-list-remove"] = "start-scaleio-remove-workflow"
 	steps["start-scaleio-remove-workflow"] = "longrunning/scaleio-remove-workflow"
 	steps["longrunning/scaleio-remove-workflow"] = "power-off-scaleio-vm"
 	steps["power-off-scaleio-vm"] = "enter-maintanence-mode"
@@ -172,7 +171,7 @@ func CreateMock(https bool) {
 			stepNext := models.Link{
 				Rel:    "step-next",
 				Href:   url,
-				Type:   "application/vnd.dellemc.coprhd.endpoint+json",
+				Type:   "application/vnd.dellemc.hostbmc.endpoint+json",
 				Method: "POST",
 			}
 
@@ -189,12 +188,12 @@ func CreateMock(https bool) {
 		}
 	})
 
-	router.POST("/fru/api/workflow/:trackingid/capture-coprhd-endpoint", func(c *gin.Context) {
+	router.POST("/fru/api/workflow/:trackingid/capture-hostbmc-endpoint", func(c *gin.Context) {
 		id = c.Param("trackingid")
-		nextStep := steps["capture-coprhd-endpoint"]
+		nextStep := steps["capture-hostbmc-endpoint"]
 		// Validate JSON Body
-		var coprhdCreds models.Endpoint
-		if c.BindJSON(&coprhdCreds) == nil {
+		var hostBMCCreds models.Endpoint
+		if c.BindJSON(&hostBMCCreds) == nil {
 			var url string
 			if https {
 				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
@@ -214,7 +213,7 @@ func CreateMock(https bool) {
 			response := models.Response{
 				ID:          id,
 				Workflow:    "quanta-replacement-d51b-esxi",
-				CurrentStep: "capture-coprhd-endpoint",
+				CurrentStep: "capture-hostbmc-endpoint",
 				Links:       links,
 			}
 
@@ -238,7 +237,7 @@ func CreateMock(https bool) {
 			stepNext := models.Link{
 				Rel:    "step-next",
 				Href:   url,
-				Type:   "application/vnd.dellemc.scaleio.endpoint+json",
+				Type:   "application/vnd.dellemc.scaleiogateway.endpoint+json",
 				Method: "POST",
 			}
 
@@ -415,39 +414,6 @@ func CreateMock(https bool) {
 			stepNext := models.Link{
 				Rel:    "step-next",
 				Href:   url,
-				Type:   "application/vnd.dellemc.scaleio_mdm.endpoint+json",
-				Method: "POST",
-			}
-
-			links := models.Links{stepNext}
-
-			response := models.Response{
-				ID:          id,
-				Workflow:    "quanta-replacement-d51b-esxi",
-				CurrentStep: "present-system-list-remove",
-				Links:       links,
-			}
-
-			c.JSON(http.StatusCreated, response)
-		}
-	})
-
-	router.POST("/fru/api/workflow/:trackingid/capture-scaleio-mdm-credentials", func(c *gin.Context) {
-		id = c.Param("trackingid")
-		nextStep := steps["capture-scaleio-mdm-credentials"]
-		// Validate JSON Body
-		var scaleioCreds models.Endpoint
-		if c.BindJSON(&scaleioCreds) == nil {
-			var url string
-			if https {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-			} else {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-			}
-
-			stepNext := models.Link{
-				Rel:    "step-next",
-				Href:   url,
 				Type:   "application/json",
 				Method: "POST",
 			}
@@ -457,7 +423,7 @@ func CreateMock(https bool) {
 			response := models.Response{
 				ID:          id,
 				Workflow:    "quanta-replacement-d51b-esxi",
-				CurrentStep: "capture-scaleio-mdm-credentials",
+				CurrentStep: "present-system-list-remove",
 				Links:       links,
 			}
 

@@ -3,16 +3,16 @@
 # Dell EMC Confidential/Proprietary Information
 #
 
-# Endpoints for FRU-PAQX workflow
----
-MinimumVersion: v0.0.1-32
-
 ## READ ME FIRST
 ##
 ## Remove the # at the start of each of the endpoint, username, and password lines below
 ## Add the endpoints and credentials for your system
 ## Make sure the format stays the same as the original example
 ## For endpoints, make sure they start with http:// or https:// and end with a port
+
+# Endpoints for FRU-PAQX workflow
+---
+MinimumVersion: v0.0.1-32
 
 RackHD:
   endpoint:
@@ -22,7 +22,7 @@ RackHD:
   password:
 #    - "admin"
 
-CoprHD:
+HostBMC:
   endpoint:
 #    - "https://10.10.10.10:9090"
   username:
@@ -38,15 +38,7 @@ vCenter:
   password:
 #    - "admin"
 
-ScaleIO:
-  endpoint:
-#    - "https://10.10.10.10:9090"
-  username:
-#    - "admin"
-  password:
-#    - "admin"
-
-ScaleIO_MDM:
+ScaleIOGateway:
   endpoint:
 #    - "https://10.10.10.10:9090"
   username:

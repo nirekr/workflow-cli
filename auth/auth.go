@@ -21,7 +21,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// TargetAuth gets vcenter auth
+// TargetAuth gets auth
 func TargetAuth(target string) (string, string, string, error) {
 
 	var endpoint, username, password string
@@ -97,7 +97,7 @@ func ParseEndpointsFile() map[string]models.Endpoint {
 		log.Fatal(err)
 	}
 
-	services := []string{"rackhd", "coprhd", "vcenter", "scaleio", "scaleio_mdm"}
+	services := []string{"rackhd", "hostbmc", "vcenter", "scaleiogateway"}
 	endpoints := make(map[string]models.Endpoint, len(services))
 
 	viper.SetConfigName("endpoint")
@@ -108,7 +108,7 @@ func ParseEndpointsFile() map[string]models.Endpoint {
 	err = viper.ReadInConfig()
 	if err != nil {
 		if strings.Contains(err.Error(), "no such file or directory") {
-			log.Warnf("Config file \"endpoint.yaml\" not found.")
+			log.Warnf(`Config file "endpoint.yaml" not found.`)
 		} else {
 			log.Warnf("Invalid endpoint.yaml: %s", err)
 		}

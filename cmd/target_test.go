@@ -29,9 +29,7 @@ var _ = Describe("Commands", func() {
 		binLocation = fmt.Sprintf("../bin/%s", runtime.GOOS)
 		binFile = fmt.Sprintf("%s/workflow-cli", binLocation)
 
-		// configDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-		// Expect(err).ToNot(HaveOccurred())
-		StateFile = fmt.Sprintf("%s/.cli", binLocation)
+		StateFile = "/tmp/.cli"
 
 		if https {
 			target = "https://localhost:8080"
@@ -50,7 +48,7 @@ var _ = Describe("Commands", func() {
 		Context("call target with valid input", func() {
 			It("INTEGRATION should set info for the target", func() {
 				// Set up command to test
-				cmd := exec.Command(binFile, "target", target)
+				cmd := exec.Command(binFile, "target", target, "--config=/tmp/.cli")
 
 				output, err := cmd.CombinedOutput()
 				Expect(err).To(BeNil())
@@ -77,7 +75,7 @@ var _ = Describe("Commands", func() {
 					target = "https://localhost:8080"
 				}
 
-				cmd := exec.Command(binFile, "target", target)
+				cmd := exec.Command(binFile, "target", target, "--config=/tmp/.cli")
 				output, err := cmd.CombinedOutput()
 				Expect(err).To(BeNil())
 
@@ -107,7 +105,7 @@ var _ = Describe("Commands", func() {
 				_ = os.Remove(StateFile)
 			})
 			It("INTEGRATION should display endpoint after target", func() {
-				cmd := exec.Command(binFile, "target")
+				cmd := exec.Command(binFile, "target", "--config=/tmp/.cli")
 				output, err := cmd.CombinedOutput()
 				Expect(err).To(BeNil())
 
@@ -117,13 +115,9 @@ var _ = Describe("Commands", func() {
 		Context("no target has been set", func() {
 			It("INTEGRATION should display no target set", func() {
 
-				_, err := os.Stat(StateFile)
-				if err == nil {
-					// err == nil means the file exists, so we remove it
-					os.Remove(StateFile)
-				}
+				os.Remove(StateFile)
 
-				cmd := exec.Command(binFile, "target")
+				cmd := exec.Command(binFile, "target", "--config=/tmp/.cli")
 				output, err := cmd.CombinedOutput()
 				Expect(err).To(BeNil())
 
