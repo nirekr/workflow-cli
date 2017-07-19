@@ -93,7 +93,7 @@ pipeline {
                     cd /go/src/github.com/dellemc-symphony/workflow-cli/
                     make build
 
-                    tar -czvf release-v0.0.1-${BUILD_ID}-windows.tgz bin/windows
+                    pushd bin/windows; zip ../../release-v0.0.1-${BUILD_ID}-windows.zip ./*; popd
                     tar -czvf release-v0.0.1-${BUILD_ID}-mac.tgz bin/darwin
                     tar -czvf release-v0.0.1-${BUILD_ID}-linux.tgz bin/linux
 
