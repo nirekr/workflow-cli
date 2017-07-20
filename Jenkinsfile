@@ -87,13 +87,13 @@ pipeline {
             }
             steps {
                 sh '''
-		    export BUILD_ID=$(git describe --always --dirty)
+                    export BUILD_ID=$(git describe --always --dirty)
 
                     go get -u github.com/aktau/github-release
                     cd /go/src/github.com/dellemc-symphony/workflow-cli/
                     make build
 
-                    pushd bin/windows; zip ../../release-v0.0.1-${BUILD_ID}-windows.zip ./*; popd
+                    cd bin/windows && zip ../../release-v0.0.1-${BUILD_ID}-windows.zip ./* && cd ../../
                     tar -czvf release-v0.0.1-${BUILD_ID}-mac.tgz bin/darwin
                     tar -czvf release-v0.0.1-${BUILD_ID}-linux.tgz bin/linux
 
