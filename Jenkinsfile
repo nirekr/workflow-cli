@@ -87,20 +87,38 @@ pipeline {
             }
             steps {
                 sh '''
+                    #!/bin/bash
+
+                    # Decide if bumping Major, Minor, or Patch
+                    LAST_COMMIT=$(git log -1 --pretty=%B)
+
+                    if [[ $LAST_COMMIT == *"MAJOR"* ]]; then
+                        BUMP=M
+
+                    elif [[ $LAST_COMMIT == *"MINOR"* ]]; then
+                        BUMP=m
+
+                    else [[ $LAST_COMMIT == *"PATCH"* ]]; then
+                        BUMP=p
+                    fi
+
+                    # Get new version number
+                    NEW_VERSION=$(increment_version.sh -$BUMP $(git describe --abbrev=0 --tag))
+
                     export BUILD_ID=$(git describe --always --dirty)
 
                     go get -u github.com/aktau/github-release
                     cd /go/src/github.com/dellemc-symphony/workflow-cli/
                     make build
 
-                    cd bin/windows && zip ../../release-v0.0.1-${BUILD_ID}-windows.zip ./* && cd ../../
-                    tar -czvf release-v0.0.1-${BUILD_ID}-mac.tgz bin/darwin
-                    tar -czvf release-v0.0.1-${BUILD_ID}-linux.tgz bin/linux
+                    cd bin/windows && zip ../../release-$NEW_VERSION-windows.zip ./* && cd ../../
+                    tar -czvf release-$NEW_VERSION-mac.tgz bin/darwin
+                    tar -czvf release-$NEW_VERSION-linux.tgz bin/linux
 
                     github-release release \
                         --user dellemc-symphony \
                         --repo workflow-cli \
-                        --tag v0.0.1-${BUILD_ID} \
+                        --tag $NEW_VERSION \
                         --name "Workflow CLI Release" \
                         --description "Workflow CLI Release" \
                         --target "${RELEASE_BRANCH}"
@@ -108,23 +126,23 @@ pipeline {
                     github-release upload \
                         --user dellemc-symphony \
                         --repo workflow-cli \
-                        --tag v0.0.1-${BUILD_ID} \
+                        --tag $NEW_VERSION \
                         --name "WorkflowCLI-Windows.zip" \
-                        --file release-v0.0.1-${BUILD_ID}-windows.zip
+                        --file release-$NEW_VERSION-windows.zip
 
                     github-release upload \
                         --user dellemc-symphony \
                         --repo workflow-cli \
-                        --tag v0.0.1-${BUILD_ID} \
+                        --tag $NEW_VERSION \
                         --name "WorkflowCLI-Mac.tgz" \
-                        --file release-v0.0.1-${BUILD_ID}-mac.tgz
+                        --file release-$NEW_VERSION-mac.tgz
 
                     github-release upload \
                         --user dellemc-symphony \
                         --repo workflow-cli \
-                        --tag v0.0.1-${BUILD_ID} \
+                        --tag $NEW_VERSION \
                         --name "WorkflowCLI-Linux.tgz" \
-                        --file release-v0.0.1-${BUILD_ID}-linux.tgz
+                        --file release-$NEW_VERSION-linux.tgz
                 '''
             }
         }
