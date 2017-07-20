@@ -109,8 +109,8 @@ pipeline {
                         --user dellemc-symphony \
                         --repo workflow-cli \
                         --tag v0.0.1-${BUILD_ID} \
-                        --name "WorkflowCLI-Windows.tgz" \
-                        --file release-v0.0.1-${BUILD_ID}-windows.tgz
+                        --name "WorkflowCLI-Windows.zip" \
+                        --file release-v0.0.1-${BUILD_ID}-windows.zip
 
                     github-release upload \
                         --user dellemc-symphony \
