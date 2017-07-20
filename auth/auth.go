@@ -63,27 +63,55 @@ func TargetAuth(target string) (string, string, string, error) {
 	}
 
 	if password == "" {
-		// Get Password
-		fmt.Printf("Enter %s Password: ", target)
+		confirmPassword := "default"
 
-		if terminal.IsTerminal(int(syscall.Stdin)) {
-			passwordBytes, err := terminal.ReadPassword(int(syscall.Stdin))
-			if err != nil {
-				log.Warnf("\nError reading password: %s", err)
-				return "", "", "", err
+		for confirmPassword != password {
+			// Get Password
+			fmt.Printf("Enter %s Password: ", target)
+
+			if terminal.IsTerminal(int(syscall.Stdin)) {
+				passwordBytes, err := terminal.ReadPassword(int(syscall.Stdin))
+				if err != nil {
+					log.Warnf("\nError reading password: %s", err)
+					return "", "", "", err
+				}
+				password = string(passwordBytes)
+
+			} else {
+				scanner.Scan()
+				if err := scanner.Err(); err != nil {
+					log.Warnf("\nError reading password: %s", err)
+					return "", "", "", err
+				}
+
+				password = scanner.Text()
 			}
-			password = string(passwordBytes)
+			fmt.Printf("\n")
 
-		} else {
-			scanner.Scan()
-			if err := scanner.Err(); err != nil {
-				log.Warnf("\nError reading password: %s", err)
-				return "", "", "", err
+			fmt.Printf("Confirm %s Password: ", target)
+			if terminal.IsTerminal(int(syscall.Stdin)) {
+				passwordBytes, err := terminal.ReadPassword(int(syscall.Stdin))
+				if err != nil {
+					log.Warnf("\nError reading password: %s", err)
+					return "", "", "", err
+				}
+				confirmPassword = string(passwordBytes)
+
+			} else {
+				scanner.Scan()
+				if err := scanner.Err(); err != nil {
+					log.Warnf("\nError reading password: %s", err)
+					return "", "", "", err
+				}
+
+				confirmPassword = scanner.Text()
 			}
+			fmt.Printf("\n")
 
-			password = scanner.Text()
+			if password != confirmPassword {
+				log.Warnf("Passwords for %s don't match.\n", target)
+			}
 		}
-		fmt.Printf("\n")
 	}
 
 	return endpoint, username, password, nil

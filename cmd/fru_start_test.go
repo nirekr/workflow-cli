@@ -162,11 +162,19 @@ var _ = Describe("FruStart", func() {
 			io.WriteString(stdin, "RackHDPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
+			//Confirm Password for RackHD
+			io.WriteString(stdin, "RackHDPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
 			//Username for HostBMC
 			io.WriteString(stdin, "HostBMCusername\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Password for HostBMC
+			io.WriteString(stdin, "HostBMCpassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Confirm Password for HostBMC
 			io.WriteString(stdin, "HostBMCpassword\n")
 			time.Sleep(500 * time.Millisecond)
 
@@ -178,11 +186,19 @@ var _ = Describe("FruStart", func() {
 			io.WriteString(stdin, "vCenterPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
+			//Confirm Password for vCenter
+			io.WriteString(stdin, "vCenterPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
 			//Username for ScaleIOGateway
 			io.WriteString(stdin, "ScaleIOGatewayUsername\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Password for ScaleIOGateway
+			io.WriteString(stdin, "ScaleIOGatewayPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Confirm Password for ScaleIOGateway
 			io.WriteString(stdin, "ScaleIOGatewayPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
@@ -220,6 +236,119 @@ var _ = Describe("FruStart", func() {
 		})
 	})
 
+	Context("When the user enters mismatched passwords", func() {
+		It("UNIT prompt for passwords again.", func() {
+			err := resources.WriteEndpointsFile("MissingCredentials", endpointLocation)
+			Expect(err).To(BeNil())
+
+			cmd := exec.Command(binFile, "fru", "start")
+
+			stdin, err := cmd.StdinPipe()
+			Expect(err).To(BeNil())
+			defer stdin.Close()
+
+			stdout, err := cmd.StdoutPipe()
+			Expect(err).To(BeNil())
+			defer stdout.Close()
+
+			stderr, err := cmd.StderrPipe()
+			Expect(err).To(BeNil())
+			defer stderr.Close()
+
+			cmd.Start()
+
+			//Username for RackHD
+			io.WriteString(stdin, "RackHDUsername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for RackHD
+			io.WriteString(stdin, "RackHDPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Confirm Password for RackHD
+			io.WriteString(stdin, "RackHDPassword_different\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Retry Password for RackHD
+			io.WriteString(stdin, "RackHDPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Retry Confirm Password for RackHD
+			io.WriteString(stdin, "RackHDPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Username for HostBMC
+			io.WriteString(stdin, "HostBMCusername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for HostBMC
+			io.WriteString(stdin, "HostBMCpassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Confirm Password for HostBMC
+			io.WriteString(stdin, "HostBMCpassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Username for vCenter
+			io.WriteString(stdin, "vCenterUsername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for vCenter
+			io.WriteString(stdin, "vCenterPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Confirm Password for vCenter
+			io.WriteString(stdin, "vCenterPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Username for ScaleIOGateway
+			io.WriteString(stdin, "ScaleIOGatewayUsername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for ScaleIOGateway
+			io.WriteString(stdin, "ScaleIOGatewayPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Confirm Password for ScaleIOGateway
+			io.WriteString(stdin, "ScaleIOGatewayPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Select node 2 for removal
+			io.WriteString(stdin, "2\n")
+			time.Sleep(500 * time.Millisecond)
+
+			// Confirm selection
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(longDelay * time.Millisecond)
+
+			//CONTINUE to allow node addition
+			io.WriteString(stdin, "CONTINUE\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Select node 2 for addition
+			io.WriteString(stdin, "2\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Confirm selection
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(500 * time.Millisecond)
+
+			errBuf := new(bytes.Buffer)
+			errBuf.ReadFrom(stderr)
+			outBuf := new(bytes.Buffer)
+			outBuf.ReadFrom(stdout)
+
+			Expect(outBuf.String()).To(ContainSubstring(nodeList))
+			Expect(outBuf.String()).To(ContainSubstring(nodeSelection))
+			Expect(outBuf.String()).To(ContainSubstring("Confirm rackhd Password"))
+			Expect(errBuf.String()).To(ContainSubstring("Passwords for rackhd don't match"))
+			Expect(errBuf.String()).To(ContainSubstring("Workflow complete"))
+
+			cmd.Wait()
+
+		})
+	})
+
 	Context("When the endpoint file is missing", func() {
 		It("UNIT should prompt for endpoints and creds", func() {
 			cmd := exec.Command(binFile, "fru", "start")
@@ -250,6 +379,10 @@ var _ = Describe("FruStart", func() {
 			io.WriteString(stdin, "RackHDPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
+			//Confirm Password for RackHD
+			io.WriteString(stdin, "RackHDPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
 			//Endpoint for HostBMC
 			io.WriteString(stdin, "HostBMCEndpoint\n")
 			time.Sleep(500 * time.Millisecond)
@@ -259,6 +392,10 @@ var _ = Describe("FruStart", func() {
 			time.Sleep(500 * time.Millisecond)
 
 			//Password for HostBMC
+			io.WriteString(stdin, "HostBMCpassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Confirm Password for HostBMC
 			io.WriteString(stdin, "HostBMCpassword\n")
 			time.Sleep(500 * time.Millisecond)
 
@@ -274,6 +411,10 @@ var _ = Describe("FruStart", func() {
 			io.WriteString(stdin, "vCenterPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
+			//Confirm Password for vCenter
+			io.WriteString(stdin, "vCenterPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
 			//Endpoint for ScaleIOGateway
 			io.WriteString(stdin, "ScaleIOGatewayEndpoint\n")
 			time.Sleep(500 * time.Millisecond)
@@ -283,6 +424,10 @@ var _ = Describe("FruStart", func() {
 			time.Sleep(500 * time.Millisecond)
 
 			//Password for ScaleIOGateway
+			io.WriteString(stdin, "ScaleIOGatewayPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Confirm Password for ScaleIOGateway
 			io.WriteString(stdin, "ScaleIOGatewayPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
