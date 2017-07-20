@@ -97,8 +97,9 @@ pipeline {
 
                     elif [[ $LAST_COMMIT == *"MINOR"* ]]; then
                         BUMP=m
-
-                    else [[ $LAST_COMMIT == *"PATCH"* ]]; then
+                    
+		    # Default to patch bump
+                    else
                         BUMP=p
                     fi
 
