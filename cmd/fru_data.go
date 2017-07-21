@@ -29,7 +29,7 @@ This command gives that data in a tabular format which can be used by the user t
 system configurations. It currently does not allow changes to the collected data sets.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Convert argument to REST call
-		fileContent, err := ioutil.ReadFile(configFile)
+		fileContent, err := ioutil.ReadFile(targetFile)
 		if err != nil {
 			log.Fatalf("Error reading config file: %s", err)
 		}

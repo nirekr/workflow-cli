@@ -36,8 +36,8 @@ ex.: workflow-cli fru target http://192.168.1.1:80`,
 			return
 		} else if len(args) < 1 {
 			// Check and see if the endpoint has been set
-			if _, err := os.Stat(configFile); err == nil {
-				fileContent, err := ioutil.ReadFile(configFile)
+			if _, err := os.Stat(targetFile); err == nil {
+				fileContent, err := ioutil.ReadFile(targetFile)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -83,7 +83,7 @@ ex.: workflow-cli fru target http://192.168.1.1:80`,
 				return
 			}
 
-			err = ioutil.WriteFile(configFile, targetb, 0666)
+			err = ioutil.WriteFile(targetFile, targetb, 0666)
 			if err != nil {
 				log.Warnf("Error storing IP address to file: %s", err)
 				return

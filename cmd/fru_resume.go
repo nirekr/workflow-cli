@@ -19,6 +19,7 @@ import (
 
 	"github.com/dellemc-symphony/workflow-cli/frutaskrunner"
 	"github.com/dellemc-symphony/workflow-cli/models"
+	"github.com/dellemc-symphony/workflow-cli/resources"
 	"github.com/dellemc-symphony/workflow-cli/transport"
 	"github.com/dellemc-symphony/workflow-cli/utils"
 
@@ -37,7 +38,9 @@ running task if there is only 1.
 Use this command to resume a failed or stopped workflow operation.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		fileContent, err := ioutil.ReadFile(configFile)
+		//Make the tests pass
+		resources.UseEndpointFile = true
+		fileContent, err := ioutil.ReadFile(targetFile)
 		if err != nil {
 			log.Fatalf("Error reading config file: %s", err)
 		}

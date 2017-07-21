@@ -16,7 +16,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var configFile string
+var targetFile string
 
 //var target string
 
@@ -42,21 +42,21 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	RootCmd.PersistentFlags().StringVar(&configFile, "config", "default", "Location of the configuration file")
+	RootCmd.PersistentFlags().StringVar(&targetFile, "config", "default", "Location of the configuration file")
 }
 
 func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
-	if configFile == "default" {
+	if targetFile == "default" {
 		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 		if err != nil {
 			log.Fatalf("Could not read application directory: %s", err.Error())
 		}
-		configFile = fmt.Sprintf("%s/.cli", dir)
+		targetFile = fmt.Sprintf("%s/.cli", dir)
 
 	}
-	// If a config file is found, read it in.
+	// If a target file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}

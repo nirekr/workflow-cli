@@ -96,6 +96,10 @@ var _ = Describe("FruStart", func() {
 
 			cmd.Start()
 
+			// Select y to use Endpoint.yaml
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(500 * time.Millisecond)
+
 			// Select node 2 for removal
 			io.WriteString(stdin, "2\n")
 			time.Sleep(500 * time.Millisecond)
@@ -134,7 +138,7 @@ var _ = Describe("FruStart", func() {
 	})
 
 	Context("When the endpoint file has endpoints but not credentials", func() {
-		It("UNIT should run the 'fru start' and prompt for input", func() {
+		It("UNIT should fail to parse the file", func() {
 			err := resources.WriteEndpointsFile("MissingCredentials", endpointLocation)
 			Expect(err).To(BeNil())
 
@@ -154,71 +158,7 @@ var _ = Describe("FruStart", func() {
 
 			cmd.Start()
 
-			//Username for RackHD
-			io.WriteString(stdin, "RackHDUsername\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Password for RackHD
-			io.WriteString(stdin, "RackHDPassword\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Confirm Password for RackHD
-			io.WriteString(stdin, "RackHDPassword\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Username for HostBMC
-			io.WriteString(stdin, "HostBMCusername\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Password for HostBMC
-			io.WriteString(stdin, "HostBMCpassword\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Confirm Password for HostBMC
-			io.WriteString(stdin, "HostBMCpassword\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Username for vCenter
-			io.WriteString(stdin, "vCenterUsername\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Password for vCenter
-			io.WriteString(stdin, "vCenterPassword\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Confirm Password for vCenter
-			io.WriteString(stdin, "vCenterPassword\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Username for ScaleIOGateway
-			io.WriteString(stdin, "ScaleIOGatewayUsername\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Password for ScaleIOGateway
-			io.WriteString(stdin, "ScaleIOGatewayPassword\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Confirm Password for ScaleIOGateway
-			io.WriteString(stdin, "ScaleIOGatewayPassword\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Select node 2 for removal
-			io.WriteString(stdin, "2\n")
-			time.Sleep(500 * time.Millisecond)
-
-			// Confirm selection
-			io.WriteString(stdin, "Y\n")
-			time.Sleep(longDelay * time.Millisecond)
-
-			//CONTINUE to allow node addition
-			io.WriteString(stdin, "CONTINUE\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Select node 2 for addition
-			io.WriteString(stdin, "2\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Confirm selection
+			// Select y to use Endpoint.yaml
 			io.WriteString(stdin, "Y\n")
 			time.Sleep(500 * time.Millisecond)
 
@@ -227,9 +167,7 @@ var _ = Describe("FruStart", func() {
 			outBuf := new(bytes.Buffer)
 			outBuf.ReadFrom(stdout)
 
-			Expect(outBuf.String()).To(ContainSubstring(nodeList))
-			Expect(outBuf.String()).To(ContainSubstring(nodeSelection))
-			Expect(errBuf.String()).To(ContainSubstring("Workflow complete"))
+			Expect(errBuf.String()).To(ContainSubstring("Endpoint file has invalid Username entry"))
 
 			cmd.Wait()
 
@@ -238,8 +176,7 @@ var _ = Describe("FruStart", func() {
 
 	Context("When the user enters mismatched passwords", func() {
 		It("UNIT prompt for passwords again.", func() {
-			err := resources.WriteEndpointsFile("MissingCredentials", endpointLocation)
-			Expect(err).To(BeNil())
+			os.Remove(StateFile)
 
 			cmd := exec.Command(binFile, "fru", "start")
 
@@ -256,6 +193,14 @@ var _ = Describe("FruStart", func() {
 			defer stderr.Close()
 
 			cmd.Start()
+
+			// Select y to use Endpoint.yaml
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Endpoint for RackHD
+			io.WriteString(stdin, "http://10.10.10.10:8080\n")
+			time.Sleep(500 * time.Millisecond)
 
 			//Username for RackHD
 			io.WriteString(stdin, "RackHDUsername\n")
@@ -277,6 +222,10 @@ var _ = Describe("FruStart", func() {
 			io.WriteString(stdin, "RackHDPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
+			//Endpoint for HostBMC
+			io.WriteString(stdin, "http://10.10.10.10:8080\n")
+			time.Sleep(500 * time.Millisecond)
+
 			//Username for HostBMC
 			io.WriteString(stdin, "HostBMCusername\n")
 			time.Sleep(500 * time.Millisecond)
@@ -289,6 +238,10 @@ var _ = Describe("FruStart", func() {
 			io.WriteString(stdin, "HostBMCpassword\n")
 			time.Sleep(500 * time.Millisecond)
 
+			//Endpoint for vCenter
+			io.WriteString(stdin, "http://10.10.10.10:8080\n")
+			time.Sleep(500 * time.Millisecond)
+
 			//Username for vCenter
 			io.WriteString(stdin, "vCenterUsername\n")
 			time.Sleep(500 * time.Millisecond)
@@ -299,6 +252,10 @@ var _ = Describe("FruStart", func() {
 
 			//Confirm Password for vCenter
 			io.WriteString(stdin, "vCenterPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Endpoint for ScaleIOGateway
+			io.WriteString(stdin, "http://10.10.10.10:8080\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Username for ScaleIOGateway
@@ -349,8 +306,10 @@ var _ = Describe("FruStart", func() {
 		})
 	})
 
-	Context("When the endpoint file is missing", func() {
-		It("UNIT should prompt for endpoints and creds", func() {
+	Context("When the user enters an invalid endpoint", func() {
+		It("UNIT prompt for endpoint again.", func() {
+			os.Remove(StateFile)
+
 			cmd := exec.Command(binFile, "fru", "start")
 
 			stdin, err := cmd.StdinPipe()
@@ -367,8 +326,20 @@ var _ = Describe("FruStart", func() {
 
 			cmd.Start()
 
+			// Select y to use Endpoint.yaml
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(500 * time.Millisecond)
+
 			//Endpoint for RackHD
-			io.WriteString(stdin, "RackHDEndpoint\n")
+			io.WriteString(stdin, "  http://10.10.10.10:8080\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Endpoint for RackHD
+			io.WriteString(stdin, "invalid-endpoint.com\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Endpoint for RackHD
+			io.WriteString(stdin, "http://10.10.10.10:8080\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Username for RackHD
@@ -380,11 +351,19 @@ var _ = Describe("FruStart", func() {
 			time.Sleep(500 * time.Millisecond)
 
 			//Confirm Password for RackHD
+			io.WriteString(stdin, "RackHDPassword_different\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Retry Password for RackHD
+			io.WriteString(stdin, "RackHDPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Retry Confirm Password for RackHD
 			io.WriteString(stdin, "RackHDPassword\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Endpoint for HostBMC
-			io.WriteString(stdin, "HostBMCEndpoint\n")
+			io.WriteString(stdin, "http://10.10.10.10:8080\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Username for HostBMC
@@ -400,7 +379,7 @@ var _ = Describe("FruStart", func() {
 			time.Sleep(500 * time.Millisecond)
 
 			//Endpoint for vCenter
-			io.WriteString(stdin, "vCenterEndpoint\n")
+			io.WriteString(stdin, "http://10.10.10.10:8080\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Username for vCenter
@@ -416,7 +395,7 @@ var _ = Describe("FruStart", func() {
 			time.Sleep(500 * time.Millisecond)
 
 			//Endpoint for ScaleIOGateway
-			io.WriteString(stdin, "ScaleIOGatewayEndpoint\n")
+			io.WriteString(stdin, "http://10.10.10.10:8080\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Username for ScaleIOGateway
@@ -456,9 +435,130 @@ var _ = Describe("FruStart", func() {
 			outBuf := new(bytes.Buffer)
 			outBuf.ReadFrom(stdout)
 
-			Expect(errBuf.String()).To(ContainSubstring("Will prompt user for endpoints."))
-			Expect(errBuf.String()).To(ContainSubstring("Config file "))
-			Expect(errBuf.String()).To(ContainSubstring("not found."))
+			Expect(outBuf.String()).To(ContainSubstring(nodeList))
+			Expect(outBuf.String()).To(ContainSubstring(nodeSelection))
+			Expect(errBuf.String()).To(ContainSubstring("Endpoint must begin with http:// or https://"))
+			Expect(errBuf.String()).To(ContainSubstring("Invalid URL"))
+			Expect(outBuf.String()).To(ContainSubstring("Confirm rackhd Password"))
+			Expect(errBuf.String()).To(ContainSubstring("Passwords for rackhd don't match"))
+			Expect(errBuf.String()).To(ContainSubstring("Workflow complete"))
+
+			cmd.Wait()
+
+		})
+	})
+
+	Context("When the endpoint file is missing", func() {
+		It("UNIT should prompt for endpoints and creds", func() {
+			cmd := exec.Command(binFile, "fru", "start")
+
+			stdin, err := cmd.StdinPipe()
+			Expect(err).To(BeNil())
+			defer stdin.Close()
+
+			stdout, err := cmd.StdoutPipe()
+			Expect(err).To(BeNil())
+			defer stdout.Close()
+
+			stderr, err := cmd.StderrPipe()
+			Expect(err).To(BeNil())
+			defer stderr.Close()
+
+			cmd.Start()
+
+			// Select N to not use Endpoint.yaml
+			io.WriteString(stdin, "N\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Endpoint for RackHD
+			io.WriteString(stdin, "http://10.10.10.10:8080\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Username for RackHD
+			io.WriteString(stdin, "RackHDUsername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for RackHD
+			io.WriteString(stdin, "RackHDPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Confirm Password for RackHD
+			io.WriteString(stdin, "RackHDPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Endpoint for HostBMC
+			io.WriteString(stdin, "http://10.10.10.10:8080\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Username for HostBMC
+			io.WriteString(stdin, "HostBMCusername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for HostBMC
+			io.WriteString(stdin, "HostBMCpassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Confirm Password for HostBMC
+			io.WriteString(stdin, "HostBMCpassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Endpoint for vCenter
+			io.WriteString(stdin, "http://10.10.10.10:8080\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Username for vCenter
+			io.WriteString(stdin, "vCenterUsername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for vCenter
+			io.WriteString(stdin, "vCenterPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Confirm Password for vCenter
+			io.WriteString(stdin, "vCenterPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Endpoint for ScaleIOGateway
+			io.WriteString(stdin, "http://10.10.10.10:8080\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Username for ScaleIOGateway
+			io.WriteString(stdin, "ScaleIOGatewayUsername\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Password for ScaleIOGateway
+			io.WriteString(stdin, "ScaleIOGatewayPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Confirm Password for ScaleIOGateway
+			io.WriteString(stdin, "ScaleIOGatewayPassword\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Select node 2 for removal
+			io.WriteString(stdin, "2\n")
+			time.Sleep(500 * time.Millisecond)
+
+			// Confirm selection
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(longDelay * time.Millisecond)
+
+			//CONTINUE to allow node addition
+			io.WriteString(stdin, "CONTINUE\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Select node 2 for addition
+			io.WriteString(stdin, "2\n")
+			time.Sleep(500 * time.Millisecond)
+
+			//Confirm selection
+			io.WriteString(stdin, "Y\n")
+			time.Sleep(500 * time.Millisecond)
+
+			errBuf := new(bytes.Buffer)
+			errBuf.ReadFrom(stderr)
+			outBuf := new(bytes.Buffer)
+			outBuf.ReadFrom(stdout)
+
 			Expect(outBuf.String()).To(ContainSubstring(nodeList))
 			Expect(outBuf.String()).To(ContainSubstring(nodeSelection))
 			Expect(errBuf.String()).To(ContainSubstring("Workflow complete"))

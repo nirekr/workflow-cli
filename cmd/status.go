@@ -24,7 +24,7 @@ var statusCmd = &cobra.Command{
 	Long: `Only to be used to determine that the system is
 up and running. Does not provide information about VxRack system.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fileContent, err := ioutil.ReadFile(configFile)
+		fileContent, err := ioutil.ReadFile(targetFile)
 		if err != nil {
 			log.Fatalf("Error reading config file: %s", err)
 		}
