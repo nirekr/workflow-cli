@@ -87,18 +87,17 @@ pipeline {
             }
             steps {
                 sh '''
-                    #!/bin/bash
-
                     # Decide if bumping Major, Minor, or Patch
                     LAST_COMMIT=$(git log -1 --pretty=%B)
 
                     BUMP=""
 
-                    if [[ "$LAST_COMMIT" =~ "MAJOR" ]]; then
-                            BUMP=M
+                    # If number of times "MAJOR" appears is greater or equal to 1
+                    if [ `echo ${LAST_COMMIT}  | grep -c "MAJOR"` -ge 1 ]; then
+                        BUMP=M
 
-                    elif [[ "$LAST_COMMIT" =~ "MINOR" ]]; then
-                            BUMP=m
+                    elif [ `echo ${LAST_COMMIT}  | grep -c "MINOR"` -ge 1 ]; then
+                        BUMP=m
 
                     # Default to patch bump
                     else
