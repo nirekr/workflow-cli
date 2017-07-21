@@ -92,21 +92,22 @@ pipeline {
                     # Decide if bumping Major, Minor, or Patch
                     LAST_COMMIT=$(git log -1 --pretty=%B)
 
-                    if [[ $LAST_COMMIT == *"MAJOR"* ]]; then
-                        BUMP=M
+                    BUMP=""
 
-                    elif [[ $LAST_COMMIT == *"MINOR"* ]]; then
-                        BUMP=m
-                    
-		    # Default to patch bump
+                    if [[ "$LAST_COMMIT" =~ "MAJOR" ]]; then
+                            BUMP=M
+
+                    elif [[ "$LAST_COMMIT" =~ "MINOR" ]]; then
+                            BUMP=m
+
+                    # Default to patch bump
                     else
                         BUMP=p
+
                     fi
 
                     # Get new version number
                     NEW_VERSION=$(increment_version.sh -$BUMP $(git describe --abbrev=0 --tag))
-
-                    export BUILD_ID=$(git describe --always --dirty)
 
                     go get -u github.com/aktau/github-release
                     cd /go/src/github.com/dellemc-symphony/workflow-cli/
