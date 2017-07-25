@@ -15,6 +15,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/ginkgo/config"
 )
 
 var _ = Describe("FruData", func() {
@@ -27,11 +28,12 @@ var _ = Describe("FruData", func() {
 		Expect(err).ToNot(HaveOccurred())
 		StateFile = fmt.Sprintf("%s/.cli", dir)
 
-		if https {
-			target = "https://localhost:8080"
-		} else {
-			target = "http://localhost:8080"
-		}
+                nodeTestPort := 8080 + config.GinkgoConfig.ParallelNode
+                if https {
+                        target = fmt.Sprintf("https://localhost:%d", nodeTestPort)
+                } else {
+                        target = fmt.Sprintf("http://localhost:%d", nodeTestPort)
+                }
 
 		cmd := exec.Command(binFile, "target", target)
 		_, err = cmd.CombinedOutput()

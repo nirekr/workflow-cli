@@ -21,6 +21,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/ginkgo/config"
 )
 
 var _ = Describe("FruResume", func() {
@@ -38,11 +39,12 @@ var _ = Describe("FruResume", func() {
 		binLocation = fmt.Sprintf("../bin/%s/workflow-cli", runtime.GOOS)
 		endpointLocation = fmt.Sprintf("../bin/%s/endpoint.yaml", runtime.GOOS)
 
-		if https {
-			target = "https://localhost:8080"
-		} else {
-			target = "http://localhost:8080"
-		}
+                nodeTestPort := 8080 + config.GinkgoConfig.ParallelNode
+                if https {
+                        target = fmt.Sprintf("https://localhost:%d", nodeTestPort)
+                } else {
+                        target = fmt.Sprintf("http://localhost:%d", nodeTestPort)
+                }
 
 		cmd := exec.Command(binLocation, "target", target)
 		err = cmd.Run()

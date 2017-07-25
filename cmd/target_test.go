@@ -17,6 +17,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/ginkgo/config"
 )
 
 var _ = Describe("Commands", func() {
@@ -31,10 +32,11 @@ var _ = Describe("Commands", func() {
 
 		StateFile = "/tmp/.cli"
 
+		nodeTestPort := 8080 + config.GinkgoConfig.ParallelNode
 		if https {
-			target = "https://localhost:8080"
+			target = fmt.Sprintf("https://localhost:%d", nodeTestPort)
 		} else {
-			target = "http://localhost:8080"
+			target = fmt.Sprintf("http://localhost:%d", nodeTestPort)
 		}
 
 	})
@@ -69,10 +71,11 @@ var _ = Describe("Commands", func() {
 		Context("Test HTTP/HTTPS mismatch error handling", func() {
 			It("INTEGRATION should fail if client and server mismatch with https", func() {
 				// Ensure client and server are not using same scheme
+				nodeTestPort := 8080 + config.GinkgoConfig.ParallelNode
 				if https {
-					target = "http://localhost:8080"
+					target = fmt.Sprintf("http://localhost:%d", nodeTestPort)
 				} else {
-					target = "https://localhost:8080"
+					target = fmt.Sprintf("https://localhost:%d", nodeTestPort)
 				}
 
 				cmd := exec.Command(binFile, "target", target, "--config=/tmp/.cli")

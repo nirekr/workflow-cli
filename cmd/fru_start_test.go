@@ -19,6 +19,7 @@ import (
 	"github.com/dellemc-symphony/workflow-cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/ginkgo/config"
 )
 
 var _ = Describe("FruStart", func() {
@@ -56,10 +57,11 @@ var _ = Describe("FruStart", func() {
 		Expect(err).ToNot(HaveOccurred())
 		StateFile = fmt.Sprintf("%s/.cli", dir)
 
+		nodeTestPort := 8080 + config.GinkgoConfig.ParallelNode
 		if https {
-			target = "https://localhost:8080"
+			target = fmt.Sprintf("https://localhost:%d", nodeTestPort)
 		} else {
-			target = "http://localhost:8080"
+			target = fmt.Sprintf("http://localhost:%d", nodeTestPort)
 		}
 
 		cmd := exec.Command(binFile, "target", target)

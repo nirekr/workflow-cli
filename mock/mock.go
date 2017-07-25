@@ -24,7 +24,13 @@ func StopMock() {
 }
 
 // CreateMock starts a mock REST Endpoint for the FRU workflow
-func CreateMock(https bool) {
+func CreateMock(https bool, port int) {
+        var scheme string
+        if https {
+		scheme = "https://"
+	} else {
+		scheme = "http://"
+	}
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	id := "123abc-456def-789ghi"
@@ -53,12 +59,7 @@ func CreateMock(https bool) {
 
 	// GET on /workflow returns list of partially completed workflows (for Resume command)
 	router.GET("/fru/api/workflow", func(c *gin.Context) {
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s", "https://", id)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s", "http://", id)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s", scheme, port, id)
 
 		workflow := models.Workflow{
 			URI: url,
@@ -72,12 +73,7 @@ func CreateMock(https bool) {
 
 	// This resumes a partially completes workflow. trackingID comes from GET /workflow
 	router.GET("/fru/api/workflow/:trackingid", func(c *gin.Context) {
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/capture-vcenter-endpoint", "https://", id)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/capture-vcenter-endpoint", "http://", id)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/capture-vcenter-endpoint", scheme, port, id)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -128,13 +124,8 @@ func CreateMock(https bool) {
 
 	// Initiates the workflow
 	router.POST("/fru/api/workflow", func(c *gin.Context) {
-		var url string
 		nextStep := steps[""]
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -161,12 +152,7 @@ func CreateMock(https bool) {
 		// Validate JSON Body
 		var rackhdCreds models.Endpoint
 		if c.BindJSON(&rackhdCreds) == nil {
-			var url string
-			if https {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-			} else {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-			}
+			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 			stepNext := models.Link{
 				Rel:    "step-next",
@@ -194,12 +180,7 @@ func CreateMock(https bool) {
 		// Validate JSON Body
 		var hostBMCCreds models.Endpoint
 		if c.BindJSON(&hostBMCCreds) == nil {
-			var url string
-			if https {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-			} else {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-			}
+			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 			stepNext := models.Link{
 				Rel:    "step-next",
@@ -227,12 +208,7 @@ func CreateMock(https bool) {
 		// Validate JSON Body
 		var vcenterCreds models.Endpoint
 		if c.BindJSON(&vcenterCreds) == nil {
-			var url string
-			if https {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-			} else {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-			}
+			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 			stepNext := models.Link{
 				Rel:    "step-next",
@@ -260,12 +236,7 @@ func CreateMock(https bool) {
 		// Validate JSON Body
 		var scaleioCreds models.Endpoint
 		if c.BindJSON(&scaleioCreds) == nil {
-			var url string
-			if https {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-			} else {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-			}
+			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 			stepNext := models.Link{
 				Rel:    "step-next",
@@ -295,12 +266,7 @@ func CreateMock(https bool) {
 		if retry == true {
 			retry = false
 			id = c.Param("trackingid")
-			var url string
-			if https {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-			} else {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-			}
+			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 			stepNext = models.Link{
 				Rel:    "step-retry",
@@ -311,12 +277,7 @@ func CreateMock(https bool) {
 
 		} else {
 			id = c.Param("trackingid")
-			var url string
-			if https {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-			} else {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-			}
+			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 			stepNext = models.Link{
 				Rel:    "step-next",
@@ -343,12 +304,7 @@ func CreateMock(https bool) {
 		nextStep := steps["start-vcenter-data-collection"]
 		// Validate JSON Body
 
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -404,12 +360,7 @@ func CreateMock(https bool) {
 		var nodeToRemove models.Node
 		if c.BindJSON(&nodeToRemove) == nil {
 
-			var url string
-			if https {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-			} else {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-			}
+			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 			stepNext := models.Link{
 				Rel:    "step-next",
@@ -434,12 +385,7 @@ func CreateMock(https bool) {
 	router.POST("/fru/api/workflow/:trackingid/start-scaleio-remove-workflow", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["start-scaleio-remove-workflow"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -478,12 +424,7 @@ func CreateMock(https bool) {
 			longRunningCount = 0
 		}
 
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -508,12 +449,7 @@ func CreateMock(https bool) {
 	router.POST("/fru/api/workflow/:trackingid/power-off-scaleio-vm", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["power-off-scaleio-vm"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -537,12 +473,7 @@ func CreateMock(https bool) {
 	router.POST("/fru/api/workflow/:trackingid/enter-maintanence-mode", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["enter-maintanence-mode"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -566,12 +497,7 @@ func CreateMock(https bool) {
 	router.POST("/fru/api/workflow/:trackingid/instruct-physical-removal", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["instruct-physical-removal"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -613,12 +539,7 @@ func CreateMock(https bool) {
 			nextType = "application/vnd.dellemc.nodes.list.add+json"
 		}
 
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -678,12 +599,7 @@ func CreateMock(https bool) {
 		var nodeToRemove models.Node
 		if c.BindJSON(&nodeToRemove) == nil {
 
-			var url string
-			if https {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-			} else {
-				url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-			}
+			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 			stepNext := models.Link{
 				Rel:    "step-next",
@@ -708,12 +624,7 @@ func CreateMock(https bool) {
 	router.POST("/fru/api/workflow/:trackingid/configure-disks-rackhd", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["configure-disks-rackhd"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -737,12 +648,7 @@ func CreateMock(https bool) {
 	router.POST("/fru/api/workflow/:trackingid/install-esxi", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["install-esxi"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -766,12 +672,7 @@ func CreateMock(https bool) {
 	router.POST("/fru/api/workflow/:trackingid/add-host-to-vcenter", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["add-host-to-vcenter"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -795,12 +696,7 @@ func CreateMock(https bool) {
 	router.POST("/fru/api/workflow/:trackingid/install-scaleio-vib", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["install-scaleio-vib"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -824,12 +720,7 @@ func CreateMock(https bool) {
 	router.POST("/fru/api/workflow/:trackingid/exit-vcenter-maintenance-mode", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["exit-vcenter-maintenance-mode"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -853,12 +744,7 @@ func CreateMock(https bool) {
 	router.POST("/fru/api/workflow/:trackingid/deploy-svm", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["deploy-svm"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -882,12 +768,7 @@ func CreateMock(https bool) {
 	router.POST("/fru/api/workflow/:trackingid/wait-for-svm-deploy", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["wait-for-svm-deploy"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -911,12 +792,7 @@ func CreateMock(https bool) {
 	router.POST("/fru/api/workflow/:trackingid/start-scaleio-add-workflow", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["start-scaleio-add-workflow"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -940,12 +816,7 @@ func CreateMock(https bool) {
 	router.POST("/fru/api/workflow/:trackingid/wait-for-scaleio-add-complete", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["wait-for-scaleio-add-complete"]
-		var url string
-		if https {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "https://", id, nextStep)
-		} else {
-			url = fmt.Sprintf("%slocalhost:8080/fru/api/workflow/%s/%s", "http://", id, nextStep)
-		}
+		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -978,6 +849,7 @@ func CreateMock(https bool) {
 		c.JSON(http.StatusCreated, response)
 	})
 
+	listenAddrPort := fmt.Sprintf(":%d", port)
 	if https {
 		// Find path to certs file. Should always be in same dir as mock.go
 		_, filename, _, _ := runtime.Caller(0)
@@ -986,8 +858,8 @@ func CreateMock(https bool) {
 			log.Fatal(err)
 		}
 
-		go manners.ListenAndServeTLS(":8080", dir+"/cert.pem", dir+"/key.pem", router)
+		go manners.ListenAndServeTLS(listenAddrPort, dir+"/cert.pem", dir+"/key.pem", router)
 	} else {
-		go manners.ListenAndServe(":8080", router)
+		go manners.ListenAndServe(listenAddrPort, router)
 	}
 }
