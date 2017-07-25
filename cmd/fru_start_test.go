@@ -37,19 +37,19 @@ var _ = Describe("FruStart", func() {
 		binFile = fmt.Sprintf("../bin/%s/workflow-cli", runtime.GOOS)
 		endpointLocation = fmt.Sprintf("../bin/%s/endpoint.yaml", runtime.GOOS)
 
-		nodeList = `+--------+----------+-------------+------------+--------------+------------------+
-| SELECT | HOSTNAME | SERVICE TAG |  MGMT IP   | POWER STATUS | CONNECTION STATE |
-+--------+----------+-------------+------------+--------------+------------------+
-|      1 | node01   |     1234567 | 10.10.10.1 | poweredOn    | Connected        |
-|      2 | node02   |    98765432 | 10.10.10.2 | poweredOn    | Connected        |
-|      3 | node03   |    91827465 | 10.10.10.3 | poweredOn    | Connected        |
-+--------+----------+-------------+------------+--------------+------------------+
+                nodeList = `+--------+---------------+-------------+--------------+--------------+------------------+
+| SELECT | ESXI HOSTNAME | SERVICE TAG | ESXI MGMT IP | POWER STATUS | CONNECTION STATE |
++--------+---------------+-------------+--------------+--------------+------------------+
+|      1 | node01        |     1234567 | 10.10.10.1   | poweredOn    | Connected        |
+|      2 | node02        |    98765432 | 10.10.10.2   | poweredOn    | Connected        |
+|      3 | node03        |    91827465 | 10.10.10.3   | poweredOn    | Connected        |
++--------+---------------+-------------+--------------+--------------+------------------+
 `
-		nodeSelection = `+----------+-------------+------------+--------------+------------------+
-| HOSTNAME | SERVICE TAG |  MGMT IP   | POWER STATUS | CONNECTION STATE |
-+----------+-------------+------------+--------------+------------------+
-| node02   |    98765432 | 10.10.10.2 | poweredOn    | Connected        |
-+----------+-------------+------------+--------------+------------------+
+                nodeSelection = `+---------------+-------------+--------------+--------------+------------------+
+| ESXI HOSTNAME | SERVICE TAG | ESXI MGMT IP | POWER STATUS | CONNECTION STATE |
++---------------+-------------+--------------+--------------+------------------+
+| node02        |    98765432 | 10.10.10.2   | poweredOn    | Connected        |
++---------------+-------------+--------------+--------------+------------------+
 `
 
 		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))

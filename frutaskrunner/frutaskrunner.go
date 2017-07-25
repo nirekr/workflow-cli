@@ -267,7 +267,7 @@ func PresentNodesToUser(action string, nodes models.Nodes) (models.Node, error) 
 	for !ok {
 		// Print result
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"Select", "Hostname", "Service Tag", "Mgmt IP", "Power Status", "Connection State"})
+		table.SetHeader([]string{"Select", "ESXi Hostname", "Service Tag", "ESXi Mgmt IP", "Power Status", "Connection State"})
 
 		for index, node := range nodes {
 			table.Append([]string{
@@ -312,7 +312,7 @@ func PresentNodesToUser(action string, nodes models.Nodes) (models.Node, error) 
 		selectedNode = nodes[selector-1]
 
 		selectedTable := tablewriter.NewWriter(os.Stdout)
-		selectedTable.SetHeader([]string{"Hostname", "Service Tag", "Mgmt IP", "Power Status", "Connection State"})
+		selectedTable.SetHeader([]string{"ESXi Hostname", "Service Tag", "ESXi Mgmt IP", "Power Status", "Connection State"})
 		selectedTable.Append([]string{
 			selectedNode.Hostname,
 			selectedNode.ServiceTag,
