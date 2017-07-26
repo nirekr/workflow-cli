@@ -46,7 +46,7 @@ _testmain.go
 *.test
 *.prof
 
-*.coverprofile
+*coverprofile*
 bin/
 vendor
 

@@ -12,8 +12,8 @@ import (
 
 	"github.com/dellemc-symphony/workflow-cli/mock"
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/onsi/ginkgo/config"
+	. "github.com/onsi/gomega"
 	"gopkg.in/gin-gonic/gin.v1"
 
 	"testing"
@@ -34,10 +34,10 @@ var router *gin.Engine
 
 var _ = BeforeSuite(func() {
 	port := 8080 + config.GinkgoConfig.ParallelNode
-	mock.CreateMock(https,port)
-	time.Sleep(50 * time.Millisecond)
+	mock.CreateMock(https, port)
+	time.Sleep(500 * time.Millisecond)
 })
 
 var _ = AfterSuite(func() {
-	mock.StopMock()
+	//mock.StopMock()
 })

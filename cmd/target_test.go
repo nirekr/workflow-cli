@@ -7,17 +7,15 @@
 package cmd_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/url"
 	"os"
 	"os/exec"
 	"runtime"
 
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/onsi/ginkgo/config"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Commands", func() {
@@ -25,24 +23,32 @@ var _ = Describe("Commands", func() {
 	var binFile string
 	var StateFile string
 	var target string
+	var configFlag string
+	var tempDir string
+	var err error
 
 	BeforeEach(func() {
 		binLocation = fmt.Sprintf("../bin/%s", runtime.GOOS)
 		binFile = fmt.Sprintf("%s/workflow-cli", binLocation)
 
-		StateFile = "/tmp/.cli"
+		tempDir, err = ioutil.TempDir("", "")
+		Expect(err).To(BeNil())
+		StateFile = fmt.Sprintf("%s/.cli", tempDir)
+		configFlag = fmt.Sprintf("--config=%s", StateFile)
 
-		nodeTestPort := 8080 + config.GinkgoConfig.ParallelNode
+		port := 8080 + config.GinkgoConfig.ParallelNode
+
 		if https {
-			target = fmt.Sprintf("https://localhost:%d", nodeTestPort)
+			target = fmt.Sprintf("https://localhost:%d", port)
 		} else {
-			target = fmt.Sprintf("http://localhost:%d", nodeTestPort)
+			target = fmt.Sprintf("http://localhost:%d", port)
 		}
 
 	})
 
 	AfterEach(func() {
 		os.Remove(StateFile)
+		os.RemoveAll(tempDir)
 	})
 
 	Describe("Test the commands", func() {
@@ -50,7 +56,7 @@ var _ = Describe("Commands", func() {
 		Context("call target with valid input", func() {
 			It("INTEGRATION should set info for the target", func() {
 				// Set up command to test
-				cmd := exec.Command(binFile, "target", target, "--config=/tmp/.cli")
+				cmd := exec.Command(binFile, "target", target, configFlag)
 
 				output, err := cmd.CombinedOutput()
 				Expect(err).To(BeNil())
@@ -71,14 +77,13 @@ var _ = Describe("Commands", func() {
 		Context("Test HTTP/HTTPS mismatch error handling", func() {
 			It("INTEGRATION should fail if client and server mismatch with https", func() {
 				// Ensure client and server are not using same scheme
-				nodeTestPort := 8080 + config.GinkgoConfig.ParallelNode
 				if https {
-					target = fmt.Sprintf("http://localhost:%d", nodeTestPort)
+					target = "http://localhost:8080"
 				} else {
-					target = fmt.Sprintf("https://localhost:%d", nodeTestPort)
+					target = "https://localhost:8080"
 				}
 
-				cmd := exec.Command(binFile, "target", target, "--config=/tmp/.cli")
+				cmd := exec.Command(binFile, "target", target, configFlag)
 				output, err := cmd.CombinedOutput()
 				Expect(err).To(BeNil())
 
@@ -95,20 +100,26 @@ var _ = Describe("Commands", func() {
 		})
 		Context("Ater target has been set", func() {
 			BeforeEach(func() {
+				// Ensure file does not exist before test
 				_, err := os.Stat(StateFile)
 				Expect(os.IsNotExist(err))
-				urlObj, err := url.Parse(target)
+
+				//Set the target
+				cmd := exec.Command(binFile, "target", target, configFlag)
+				_, err = cmd.CombinedOutput()
+
+				Expect(err).To(BeNil())
+
+				// Verify state file is created
+				_, err = ioutil.ReadFile(StateFile)
 				Expect(err).ToNot(HaveOccurred())
-				urlBytes, err := json.Marshal(urlObj)
-				Expect(err).ToNot(HaveOccurred())
-				err = ioutil.WriteFile(StateFile, urlBytes, 0666)
-				Expect(err).ToNot(HaveOccurred())
+
 			})
 			AfterEach(func() {
 				_ = os.Remove(StateFile)
 			})
 			It("INTEGRATION should display endpoint after target", func() {
-				cmd := exec.Command(binFile, "target", "--config=/tmp/.cli")
+				cmd := exec.Command(binFile, "target", configFlag)
 				output, err := cmd.CombinedOutput()
 				Expect(err).To(BeNil())
 
@@ -120,7 +131,7 @@ var _ = Describe("Commands", func() {
 
 				os.Remove(StateFile)
 
-				cmd := exec.Command(binFile, "target", "--config=/tmp/.cli")
+				cmd := exec.Command(binFile, "target", configFlag)
 				output, err := cmd.CombinedOutput()
 				Expect(err).To(BeNil())
 

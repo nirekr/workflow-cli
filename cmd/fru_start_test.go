@@ -10,30 +10,33 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"time"
 
 	"github.com/dellemc-symphony/workflow-cli/resources"
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/onsi/ginkgo/config"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("FruStart", func() {
 	var binFile string
 	var endpointLocation string
+	var tempDir string
 	var StateFile string
+	var configFlag string
 	var target string
 	var nodeList string
 	var nodeSelection string
 	var longDelay time.Duration
+	var err error
 
 	BeforeEach(func() {
 
-		longDelay = 35000
+		longDelay = 15000
 
 		binFile = fmt.Sprintf("../bin/%s/workflow-cli", runtime.GOOS)
 		endpointLocation = fmt.Sprintf("../bin/%s/endpoint.yaml", runtime.GOOS)
@@ -53,9 +56,10 @@ var _ = Describe("FruStart", func() {
 +----------+-------------+------------+--------------+------------------+
 `
 
-		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-		Expect(err).ToNot(HaveOccurred())
-		StateFile = fmt.Sprintf("%s/.cli", dir)
+		tempDir, err = ioutil.TempDir("", "")
+		Expect(err).To(BeNil())
+		StateFile = fmt.Sprintf("%s/.cli", tempDir)
+		configFlag = fmt.Sprintf("--config=%s", StateFile)
 
 		nodeTestPort := 8080 + config.GinkgoConfig.ParallelNode
 		if https {
@@ -64,7 +68,7 @@ var _ = Describe("FruStart", func() {
 			target = fmt.Sprintf("http://localhost:%d", nodeTestPort)
 		}
 
-		cmd := exec.Command(binFile, "target", target)
+		cmd := exec.Command(binFile, "target", target, configFlag)
 		err = cmd.Run()
 		Expect(err).To(BeNil())
 
@@ -73,6 +77,7 @@ var _ = Describe("FruStart", func() {
 	})
 	AfterEach(func() {
 		os.Remove(StateFile)
+		os.RemoveAll(tempDir)
 	})
 
 	Context("When the endpoint file has all fields filled", func() {
@@ -82,7 +87,7 @@ var _ = Describe("FruStart", func() {
 
 			startTime := time.Now()
 
-			cmd := exec.Command(binFile, "fru", "start")
+			cmd := exec.Command(binFile, "fru", "start", configFlag)
 
 			stdin, err := cmd.StdinPipe()
 			Expect(err).To(BeNil())
@@ -97,6 +102,7 @@ var _ = Describe("FruStart", func() {
 			defer stderr.Close()
 
 			cmd.Start()
+			time.Sleep(1500 * time.Millisecond)
 
 			// Select y to use Endpoint.yaml
 			io.WriteString(stdin, "Y\n")
@@ -144,7 +150,7 @@ var _ = Describe("FruStart", func() {
 			err := resources.WriteEndpointsFile("MissingCredentials", endpointLocation)
 			Expect(err).To(BeNil())
 
-			cmd := exec.Command(binFile, "fru", "start")
+			cmd := exec.Command(binFile, "fru", "start", configFlag)
 
 			stdin, err := cmd.StdinPipe()
 			Expect(err).To(BeNil())
@@ -159,6 +165,7 @@ var _ = Describe("FruStart", func() {
 			defer stderr.Close()
 
 			cmd.Start()
+			time.Sleep(1500 * time.Millisecond)
 
 			// Select y to use Endpoint.yaml
 			io.WriteString(stdin, "Y\n")
@@ -178,9 +185,7 @@ var _ = Describe("FruStart", func() {
 
 	Context("When the user enters mismatched passwords", func() {
 		It("UNIT prompt for passwords again.", func() {
-			os.Remove(StateFile)
-
-			cmd := exec.Command(binFile, "fru", "start")
+			cmd := exec.Command(binFile, "fru", "start", configFlag)
 
 			stdin, err := cmd.StdinPipe()
 			Expect(err).To(BeNil())
@@ -195,9 +200,10 @@ var _ = Describe("FruStart", func() {
 			defer stderr.Close()
 
 			cmd.Start()
+			time.Sleep(2000 * time.Millisecond)
 
 			// Select y to use Endpoint.yaml
-			io.WriteString(stdin, "Y\n")
+			io.WriteString(stdin, "N\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Endpoint for RackHD
@@ -310,9 +316,7 @@ var _ = Describe("FruStart", func() {
 
 	Context("When the user enters an invalid endpoint", func() {
 		It("UNIT prompt for endpoint again.", func() {
-			os.Remove(StateFile)
-
-			cmd := exec.Command(binFile, "fru", "start")
+			cmd := exec.Command(binFile, "fru", "start", configFlag)
 
 			stdin, err := cmd.StdinPipe()
 			Expect(err).To(BeNil())
@@ -327,17 +331,14 @@ var _ = Describe("FruStart", func() {
 			defer stderr.Close()
 
 			cmd.Start()
+			time.Sleep(500 * time.Millisecond)
 
 			// Select y to use Endpoint.yaml
-			io.WriteString(stdin, "Y\n")
+			io.WriteString(stdin, "N\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Endpoint for RackHD
 			io.WriteString(stdin, "  http://10.10.10.10:8080\n")
-			time.Sleep(500 * time.Millisecond)
-
-			//Endpoint for RackHD
-			io.WriteString(stdin, "invalid-endpoint.com\n")
 			time.Sleep(500 * time.Millisecond)
 
 			//Endpoint for RackHD
@@ -439,7 +440,6 @@ var _ = Describe("FruStart", func() {
 
 			Expect(outBuf.String()).To(ContainSubstring(nodeList))
 			Expect(outBuf.String()).To(ContainSubstring(nodeSelection))
-			Expect(errBuf.String()).To(ContainSubstring("Endpoint must begin with http:// or https://"))
 			Expect(errBuf.String()).To(ContainSubstring("Invalid URL"))
 			Expect(outBuf.String()).To(ContainSubstring("Confirm rackhd Password"))
 			Expect(errBuf.String()).To(ContainSubstring("Passwords for rackhd don't match"))
@@ -452,7 +452,7 @@ var _ = Describe("FruStart", func() {
 
 	Context("When the endpoint file is missing", func() {
 		It("UNIT should prompt for endpoints and creds", func() {
-			cmd := exec.Command(binFile, "fru", "start")
+			cmd := exec.Command(binFile, "fru", "start", configFlag)
 
 			stdin, err := cmd.StdinPipe()
 			Expect(err).To(BeNil())
@@ -467,6 +467,7 @@ var _ = Describe("FruStart", func() {
 			defer stderr.Close()
 
 			cmd.Start()
+			time.Sleep(1500 * time.Millisecond)
 
 			// Select N to not use Endpoint.yaml
 			io.WriteString(stdin, "N\n")

@@ -25,11 +25,11 @@ func StopMock() {
 
 // CreateMock starts a mock REST Endpoint for the FRU workflow
 func CreateMock(https bool, port int) {
-        var scheme string
-        if https {
-		scheme = "https://"
+	var targetURL string
+	if https {
+		targetURL = "https://localhost"
 	} else {
-		scheme = "http://"
+		targetURL = "http://localhost"
 	}
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
@@ -59,7 +59,7 @@ func CreateMock(https bool, port int) {
 
 	// GET on /workflow returns list of partially completed workflows (for Resume command)
 	router.GET("/fru/api/workflow", func(c *gin.Context) {
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s", scheme, port, id)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s", targetURL, port, id)
 
 		workflow := models.Workflow{
 			URI: url,
@@ -73,7 +73,7 @@ func CreateMock(https bool, port int) {
 
 	// This resumes a partially completes workflow. trackingID comes from GET /workflow
 	router.GET("/fru/api/workflow/:trackingid", func(c *gin.Context) {
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/capture-vcenter-endpoint", scheme, port, id)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/capture-vcenter-endpoint", targetURL, port, id)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -125,7 +125,7 @@ func CreateMock(https bool, port int) {
 	// Initiates the workflow
 	router.POST("/fru/api/workflow", func(c *gin.Context) {
 		nextStep := steps[""]
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -152,7 +152,7 @@ func CreateMock(https bool, port int) {
 		// Validate JSON Body
 		var rackhdCreds models.Endpoint
 		if c.BindJSON(&rackhdCreds) == nil {
-			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+			url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 			stepNext := models.Link{
 				Rel:    "step-next",
@@ -180,7 +180,7 @@ func CreateMock(https bool, port int) {
 		// Validate JSON Body
 		var hostBMCCreds models.Endpoint
 		if c.BindJSON(&hostBMCCreds) == nil {
-			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+			url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 			stepNext := models.Link{
 				Rel:    "step-next",
@@ -208,7 +208,7 @@ func CreateMock(https bool, port int) {
 		// Validate JSON Body
 		var vcenterCreds models.Endpoint
 		if c.BindJSON(&vcenterCreds) == nil {
-			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+			url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 			stepNext := models.Link{
 				Rel:    "step-next",
@@ -236,7 +236,7 @@ func CreateMock(https bool, port int) {
 		// Validate JSON Body
 		var scaleioCreds models.Endpoint
 		if c.BindJSON(&scaleioCreds) == nil {
-			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+			url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 			stepNext := models.Link{
 				Rel:    "step-next",
@@ -266,7 +266,7 @@ func CreateMock(https bool, port int) {
 		if retry == true {
 			retry = false
 			id = c.Param("trackingid")
-			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+			url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 			stepNext = models.Link{
 				Rel:    "step-retry",
@@ -277,7 +277,7 @@ func CreateMock(https bool, port int) {
 
 		} else {
 			id = c.Param("trackingid")
-			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+			url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 			stepNext = models.Link{
 				Rel:    "step-next",
@@ -304,7 +304,7 @@ func CreateMock(https bool, port int) {
 		nextStep := steps["start-vcenter-data-collection"]
 		// Validate JSON Body
 
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -360,7 +360,7 @@ func CreateMock(https bool, port int) {
 		var nodeToRemove models.Node
 		if c.BindJSON(&nodeToRemove) == nil {
 
-			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+			url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 			stepNext := models.Link{
 				Rel:    "step-next",
@@ -385,7 +385,7 @@ func CreateMock(https bool, port int) {
 	router.POST("/fru/api/workflow/:trackingid/start-scaleio-remove-workflow", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["start-scaleio-remove-workflow"]
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -424,7 +424,7 @@ func CreateMock(https bool, port int) {
 			longRunningCount = 0
 		}
 
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -449,7 +449,7 @@ func CreateMock(https bool, port int) {
 	router.POST("/fru/api/workflow/:trackingid/power-off-scaleio-vm", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["power-off-scaleio-vm"]
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -473,7 +473,7 @@ func CreateMock(https bool, port int) {
 	router.POST("/fru/api/workflow/:trackingid/enter-maintanence-mode", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["enter-maintanence-mode"]
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -497,7 +497,7 @@ func CreateMock(https bool, port int) {
 	router.POST("/fru/api/workflow/:trackingid/instruct-physical-removal", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["instruct-physical-removal"]
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -539,7 +539,7 @@ func CreateMock(https bool, port int) {
 			nextType = "application/vnd.dellemc.nodes.list.add+json"
 		}
 
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -599,7 +599,7 @@ func CreateMock(https bool, port int) {
 		var nodeToRemove models.Node
 		if c.BindJSON(&nodeToRemove) == nil {
 
-			url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+			url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 			stepNext := models.Link{
 				Rel:    "step-next",
@@ -624,7 +624,7 @@ func CreateMock(https bool, port int) {
 	router.POST("/fru/api/workflow/:trackingid/configure-disks-rackhd", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["configure-disks-rackhd"]
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -648,7 +648,7 @@ func CreateMock(https bool, port int) {
 	router.POST("/fru/api/workflow/:trackingid/install-esxi", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["install-esxi"]
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -672,7 +672,7 @@ func CreateMock(https bool, port int) {
 	router.POST("/fru/api/workflow/:trackingid/add-host-to-vcenter", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["add-host-to-vcenter"]
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -696,7 +696,7 @@ func CreateMock(https bool, port int) {
 	router.POST("/fru/api/workflow/:trackingid/install-scaleio-vib", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["install-scaleio-vib"]
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -720,7 +720,7 @@ func CreateMock(https bool, port int) {
 	router.POST("/fru/api/workflow/:trackingid/exit-vcenter-maintenance-mode", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["exit-vcenter-maintenance-mode"]
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -744,7 +744,7 @@ func CreateMock(https bool, port int) {
 	router.POST("/fru/api/workflow/:trackingid/deploy-svm", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["deploy-svm"]
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -768,7 +768,7 @@ func CreateMock(https bool, port int) {
 	router.POST("/fru/api/workflow/:trackingid/wait-for-svm-deploy", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["wait-for-svm-deploy"]
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -792,7 +792,7 @@ func CreateMock(https bool, port int) {
 	router.POST("/fru/api/workflow/:trackingid/start-scaleio-add-workflow", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["start-scaleio-add-workflow"]
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",
@@ -816,7 +816,7 @@ func CreateMock(https bool, port int) {
 	router.POST("/fru/api/workflow/:trackingid/wait-for-scaleio-add-complete", func(c *gin.Context) {
 		id = c.Param("trackingid")
 		nextStep := steps["wait-for-scaleio-add-complete"]
-		url := fmt.Sprintf("%slocalhost:%d/fru/api/workflow/%s/%s", scheme, port, id, nextStep)
+		url := fmt.Sprintf("%s:%d/fru/api/workflow/%s/%s", targetURL, port, id, nextStep)
 
 		stepNext := models.Link{
 			Rel:    "step-next",

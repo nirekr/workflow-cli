@@ -220,7 +220,7 @@ func InitiateWorkflow(target string) (models.Response, error) {
 
 	}
 
-	log.Printf("Server target is %s\n", target)
+	log.Printf("Server target is %s", target)
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf(target+"/fru/api/workflow"), body)
 	if err != nil {
 		return models.Response{}, fmt.Errorf("Error creating new request: %s", err)
