@@ -70,9 +70,9 @@ pipeline {
                     make coverage
 		    mkdir -p ${WORKSPACE}/Cobcov
 		    find . -name '*coverage*.xml' -exec cp {} ${WORKSPACE}/Cobcov  \\;
-		    step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: '**/Cobcov/*.xml',  failNoReports: false, failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, sourceEncoding: 'ASCII', zoomCoverageChart: false])
-
-                '''
+		'''
+		 step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: '**/Cobcov/*.xml',  failNoReports: false, failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, sourceEncoding: 'ASCII', zoomCoverageChart: false])
+		
             }
         }    
 	    
