@@ -26,7 +26,11 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                doCheckout()
+                checkout([$class: 'GitSCM', branches: [[name: env.BRANCH_NAME]], 
+			  doGenerateSubmoduleConfigurations: false, 
+			  extensions: [[$class: 'CloneOption', depth: 0, noTags: false, reference: '', shallow: false], [$class: 'AuthorInChangelog']], 
+			  gitTool: 'linux-git', submoduleCfg: [], 
+			  userRemoteConfigs: [[credentialsId: 'github-oauth-token', url: 'https://github.com/dellemc-symphony/workflow-cli']]])
 	    }
 	}
         stage('Dependencies') {
