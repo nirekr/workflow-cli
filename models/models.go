@@ -27,11 +27,12 @@ type Endpoint struct {
 
 // Response is a struct ...
 type Response struct {
-	ID          string `json:"id,omitempty"`
-	Workflow    string `json:"workflow, omitempty"`
-	CurrentStep string `json:"currentStep,omitempty"`
-	Nodes       Nodes  `json:"nodes"`
-	Links       Links  `json:"links"`
+	ID          string     `json:"id,omitempty"`
+	Workflow    string     `json:"workflow, omitempty"`
+	CurrentStep string     `json:"currentStep,omitempty"`
+	Nodes       Nodes      `json:"nodes"`
+	Links       Links      `json:"links"`
+	Networking  Networking `json:"networking"`
 }
 
 // Link is a struct ...
@@ -53,6 +54,29 @@ type Node struct {
 	UUID            string `json:"uuid,omitempty"`
 }
 
+// Networking is a struct ...
+type Networking struct {
+	Hostname    string      `json:"hostname,omitempty"`
+	DvsNetworks DvsNetworks `json:"dvsNetworkList,omitempty"`
+}
+
+// VmkAdapter is a struct ...
+type VmkAdapter struct {
+	Device         string `json:"device,omitempty"`
+	Network        string `json:"network,omitempty"`
+	IpAddress      string `json:"ipAddress,omitempty"`
+	SubnetMask     string `json:"subnetMask,omitempty"`
+	Mtu            string `json:"mtu,omitempty"`
+	EnabledService string `json:"enabledService,omitempty"`
+}
+
+// DvsNetwork is a struct ...
+type DvsNetwork struct {
+	DvsName      string      `json:"dvsName,omitempty"`
+	PhysicalNics []string    `json:"physicalNics,omitempty"`
+	VmkAdapters  VmkAdapters `json:"vmkAdapters,omitempty"`
+}
+
 // MockDataResponse is a struct ...
 type MockDataResponse struct {
 	Response string `json:"response,omitempty"`
@@ -67,6 +91,12 @@ type Nodes []Node
 
 // Workflows is a ...
 type Workflows []Workflow
+
+// DvsNetworks is a ...
+type DvsNetworks []DvsNetwork
+
+// VmkAdapters is a ...
+type VmkAdapters []VmkAdapter
 
 // Workflow is a ...
 type Workflow struct {

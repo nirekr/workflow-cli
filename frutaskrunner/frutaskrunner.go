@@ -171,6 +171,27 @@ func RunTask(r models.Response, target string) error {
 			return nil
 		}
 
+		if r.Networking.Hostname != "" {
+			fmt.Printf("Networking info for this host:\n\n")
+			fmt.Printf("Hostname     : %s\n", r.Networking.Hostname)
+
+			for i := range r.Networking.DvsNetworks {
+				fmt.Printf("Dvs          : %s\n", r.Networking.DvsNetworks[i].DvsName)
+				fmt.Printf("Physical Nics: %+v\n", r.Networking.DvsNetworks[i].PhysicalNics)
+				for j := range r.Networking.DvsNetworks[i].VmkAdapters {
+					fmt.Printf("Vmk Device   : ")
+					fmt.Printf("Device %s, ", r.Networking.DvsNetworks[i].VmkAdapters[j].Device)
+					fmt.Printf("Network %s, ", r.Networking.DvsNetworks[i].VmkAdapters[j].Network)
+					fmt.Printf("IP Address %s, ", r.Networking.DvsNetworks[i].VmkAdapters[j].IpAddress)
+					fmt.Printf("Subnet Mask %s, ", r.Networking.DvsNetworks[i].VmkAdapters[j].SubnetMask)
+					fmt.Printf("MTU %s, ", r.Networking.DvsNetworks[i].VmkAdapters[j].Mtu)
+					fmt.Printf("Enabled Services %s, ", r.Networking.DvsNetworks[i].VmkAdapters[j].EnabledService)
+					fmt.Printf("\n")
+
+				}
+			}
+		}
+
 		delay := r.Links[index].Delay
 
 		switch r.Links[index].Rel {
