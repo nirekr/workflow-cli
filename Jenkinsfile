@@ -85,7 +85,7 @@ pipeline {
                               submoduleCfg: [],
                               userRemoteConfigs: [[url: 'https://github.com/nexB/scancode-toolkit.git']]])
 		     checkout changelog: false, poll: false, scm: [$class: 'GitSCM',
-			      branches: [[name: '*/develop']],
+			      branches: [[name: '*/master']],
 			      doGenerateSubmoduleConfigurations: false,
 			      extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'workflow-cli']],
 			      gitTool: 'linux-git', submoduleCfg: [],
