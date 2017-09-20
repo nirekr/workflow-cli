@@ -167,9 +167,6 @@ pipeline {
         }
     }
     post {
-        always {
-            // cleanWorkspace()
-        }
         success {
             successEmail()
         }
