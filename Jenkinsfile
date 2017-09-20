@@ -72,15 +72,16 @@ pipeline {
 		    find . -name '*coverage*.xml' -exec cp {} ${WORKSPACE}/Cobcov  \\;
 		'''
 		 step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: '**/Cobcov/*.xml',  failNoReports: false, failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, sourceEncoding: 'ASCII', zoomCoverageChart: false])
-		
+	       }
             }
 
-        stage('Licenses')
+	stage('Licenses') {
             steps {
                 sh '''
                    cd /go/src/github.com/dellemc-symphony/workflow-cli/
                    make licenses
-                '''   
+                '''
+	       }
            }
 	    
         stage('NexB Scan') {

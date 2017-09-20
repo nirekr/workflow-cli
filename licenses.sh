@@ -4,5 +4,5 @@ go get -u github.com/pmezard/licenses
 
 for i in `cat glide.yaml | grep package | awk '{ print $3 }'` 
 do 
-   bin/licenses $i
+   licenses $i
 done
