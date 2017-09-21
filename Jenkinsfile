@@ -81,8 +81,8 @@ pipeline {
                    cd /go/src/github.com/dellemc-symphony/workflow-cli/
                    mkdir -p ${WORKSPACE}/target/generated-sources/license
                    make licenses
-                   archiveArtifacts '**/target/**'
                 '''
+                archiveArtifacts '**/target/**'
 	       }
            }
 	    
