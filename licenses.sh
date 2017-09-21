@@ -2,8 +2,7 @@
 shopt -s nullglob
 
 go get -u github.com/king-jam/licenses
-rootdir=`pwd`
-licensedir="$rootdir/target/generated-sources/license"
+licensedir="${WORKSPACE}/target/generated-sources/license"
 [ -d $licensedir ] || mkdir -p $licensedir
 src="/go/src/github.com/dellemc-symphony/workflow-cli/"
 cd /go/src
