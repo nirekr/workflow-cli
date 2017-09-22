@@ -13,8 +13,8 @@ done > $src/license.out
 
 if [ -f $src/license.out ]; then
         lines=`wc $src/license.out | awk '{ print $1 }'`
-        echo "Lists of $lines third-party dependencies." > $licensedir/THIRD-PARTY.TXT
-        cat $src/license.out >> $licensedir/THIRD-PARTY.TXT
+        echo "Lists of $lines third-party dependencies." > $licensedir/THIRD-PARTY.txt
+        cat $src/license.out >> $licensedir/THIRD-PARTY.txt
         exit 0
 else 
         echo "Problems getting third party license information"
