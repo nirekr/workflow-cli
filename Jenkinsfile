@@ -15,7 +15,7 @@ pipeline {
     environment {
         GIT_CREDS = credentials('github-03')
         GITHUB_TOKEN = credentials('github-02')
-        RELEASE_BRANCH = 'develop'
+        RELEASE_BRANCH = 'master'
     }
     options {
         skipDefaultCheckout()
