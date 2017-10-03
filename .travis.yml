@@ -1,0 +1,13 @@
+sudo: required
+
+env:
+  - IMAGE_NAME="rackhd/golang"
+    GO_VERSION="1.8.3"
+
+services:
+- docker
+script:
+  - mvn clean compile
+  - mvn test
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
