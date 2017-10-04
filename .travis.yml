@@ -1,13 +1,9 @@
 sudo: required
 
-env:
-  - IMAGE_NAME="rackhd/golang"
-    GO_VERSION="1.8.3"
-
+language: go
 services:
 - docker
-script:
-  - mvn clean compile
-  - mvn test
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+before_install:
+- docker pull rackhd/golang:1.8.3
+- docker run -it rackhd/golang:1.8.3
+- echo ${PWD}
