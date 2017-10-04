@@ -7,9 +7,9 @@ before_install:
 - docker run -it rackhd/golang:1.8.3
 - echo ${PWD}
 - export GIT_SSL_NO_VERIFY=1
-mkdir -p /go/src/github.com/dellemc-symphony/
-cd /go/src/github.com/dellemc-symphony/
-git clone https://github.com/dellemc-symphony/workflow-cli.git
+- mkdir -p /go/src/github.com/dellemc-symphony/
+- cd /go/src/github.com/dellemc-symphony/
+- git clone https://github.com/dellemc-symphony/workflow-cli.git
 script:
 - cd /go/src/github.com/dellemc-symphony/workflow-cli/
 - make creds
