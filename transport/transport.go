@@ -14,6 +14,7 @@ import (
 	cleanhttp "github.com/hashicorp/go-cleanhttp"
 )
 
+
 // NewClient returns an HTTP client with optional HTTPS
 func NewClient(target string) (*http.Client, error) {
 
