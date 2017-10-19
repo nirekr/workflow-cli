@@ -88,6 +88,9 @@ cover-cmd: test
 coverage:
 	./coverage.sh
 
+licenses:
+	./licenses.sh
+
 build: build-linux build-mac build-windows
 
 build-linux:
