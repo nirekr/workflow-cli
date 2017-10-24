@@ -1,12 +1,13 @@
 language: go
 
 go: 
-  - tip
+  - 1.x
 
-install:
-  - go get -t -v ./...
+install: true
+
+before_script:
+  - go get -v github.com/golang/lint/golint
   
-matrix:
-  allow_failures:
-    - go: master
-  fast_finish: true
+script: 
+  - go test ./...
+  
