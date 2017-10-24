@@ -1,0 +1,13 @@
+language: go
+
+go: 
+  - 1.8
+  - 1.9
+  - tip
+
+install:
+  - make install
+
+script:
+  - make lint
+  - make test
