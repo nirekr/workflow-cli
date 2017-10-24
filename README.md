@@ -1,6 +1,4 @@
 [![License](http://img.shields.io/badge/License-EPL%201.0-red.svg)](http://opensource.org/licenses/EPL-1.0)
-[codecov](https://codecov.io/gh/dellemc-symphony/wokrflow-cli/branch/master/graph/badge.svg)]
-(https://codecov.io/gh/dellemc-symphony/wokrflow-cli) 
 [![Go Report Card](https://goreportcard.com/badge/github.com/dellemc-symphony/workflow-cli)](https://goreportcard.com/report/github.com/dellemc-symphony/workflow-cli)
 [![Build Status](https://travis-ci.org/dellemc-symphony/wokrflow-cli.svg?branch=master)]
 (https://travis-ci.org/dellemc-symphony/workflow-cli)
