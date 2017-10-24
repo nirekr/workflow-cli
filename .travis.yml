@@ -20,6 +20,9 @@ script:
 
 before_script:
   - go get -v github.com/golang/lint/golint
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -f .cover/coverage.txt
  
   
 
