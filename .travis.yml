@@ -3,10 +3,15 @@ language: go
 go: 
   - 1.x
 
-install: true
+install:
+  - go get -t -v ./...
+
+script: 
+  - make test
 
 before_script:
   - go get -v github.com/golang/lint/golint
   
-script: go test ./...
+
+  
   
