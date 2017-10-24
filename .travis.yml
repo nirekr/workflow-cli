@@ -1,15 +1,24 @@
+sudo: required 
+
 language: go
 
 go: 
   - 1.x
 
+services:
+  - docker
+  
 install:
   - go get -t -v ./...
 
-script: go test ./...
+script: 
+  - go test ./...
+  - make creds
+  - make deps
 
 before_script:
   - go get -v github.com/golang/lint/golint
+ 
   
 
   
