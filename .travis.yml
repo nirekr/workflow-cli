@@ -12,9 +12,9 @@ install:
   - go get -t -v ./...
 
 script: 
-  - go test ./...
   - make creds
   - make deps
+  - make test
 
 before_script:
   - go get -v github.com/golang/lint/golint
