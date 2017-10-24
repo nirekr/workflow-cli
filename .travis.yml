@@ -8,6 +8,5 @@ install: true
 before_script:
   - go get -v github.com/golang/lint/golint
   
-script: 
-  - go test ./...
+script: go test ./...
   
