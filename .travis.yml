@@ -15,8 +15,7 @@ script:
   - make creds
   - make deps
   - make test
-  - mvn compile
-  - mvn test
+
 
 before_script:
   - go get -v github.com/golang/lint/golint
