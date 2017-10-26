@@ -15,10 +15,11 @@ script:
   - make creds
   - make deps
   - make test
-
+  - $GOPATH/bin/goveralls -service=travis-ci
 
 before_script:
   - go get -v github.com/golang/lint/golint
+  - go get github.com/mattn/goveralls
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) 
